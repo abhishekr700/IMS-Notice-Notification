@@ -25,7 +25,7 @@ def notify(newd,origd):
 
 def sendMail(newd,origd):
     # creates SMTP session 
-    s = smtplib.SMTP('smtp.gmail.com', 587) 
+    s = smtplib.SMTP('smtp.gmail.com', 5000) 
     
     # start TLS for security 
     s.starttls() 
@@ -51,7 +51,7 @@ def sendMail(newd,origd):
 # In[96]:
 
 
-url = "https://www.imsnsit.org/imsnsit/notifications.php"
+url = "http://1ab61060.ngrok.io/Temp.html"
 data = r.get(url)
 plain = data.text
 obj = BeautifulSoup(plain,"html.parser")
