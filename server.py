@@ -65,9 +65,9 @@ print("Original:",origData)
 
 changed = False
 while  not changed:
-    print("Loop Run ",end=" ")
+    print("Loop Run ")
     time.sleep(5)
-    print("Making Request",end= " ")
+    print("Making Request")
     
     data = r.get(url)
     plain = data.text
