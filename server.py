@@ -9,7 +9,7 @@ import requests as r
 import time
 from bs4 import BeautifulSoup
 import smtplib
-
+from os import environ
 
 # In[94]:
 
@@ -25,7 +25,10 @@ def notify(newd,origd):
 
 def sendMail(newd,origd):
     # creates SMTP session 
-    s = smtplib.SMTP('smtp.gmail.com', 5000) 
+    
+    port = int(environ.get('PORT', 5000))
+    print(port)
+    s = smtplib.SMTP('smtp.gmail.com', port) 
     
     # start TLS for security 
     s.starttls() 
