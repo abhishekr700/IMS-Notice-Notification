@@ -26,7 +26,7 @@ def notify(newd,origd):
 def sendMail(newd,origd):
     # creates SMTP session 
     
-    port = int(environ.get('PORT', 5000))
+    port = int(environ.get('PORT', 587))
     print(port)
     s = smtplib.SMTP('smtp.gmail.com', port) 
     
