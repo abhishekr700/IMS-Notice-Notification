@@ -1,11 +1,3 @@
-from os import environ
-from flask import Flask
-app = Flask(__name__)
-#app.run(environ.get('PORT'))
-# Bind to PORT if defined, otherwise default to 5000.
-port = int(environ.get('PORT', 5000))
-app.run(host='0.0.0.0', port=port)
-
 # ===  SCRIPT BEGIN
 #!/usr/bin/env python
 # coding: utf-8

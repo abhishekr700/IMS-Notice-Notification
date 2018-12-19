@@ -1,6 +1,4 @@
 beautifulsoup4==4.6.3
-Flask==1.0.2
-Flask-Cors==3.0.6
 html5lib==1.0.1
 hyperlink==18.0.0
 pyparsing==2.2.0
