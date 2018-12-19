@@ -54,7 +54,7 @@ def sendMail(newd,origd):
 # In[96]:
 
 
-url = "http://1ab61060.ngrok.io/Temp.html"
+url = "https://www.imsnsit.org/imsnsit/notifications.php"
 data = r.get(url)
 plain = data.text
 obj = BeautifulSoup(plain,"html.parser")
