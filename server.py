@@ -26,9 +26,9 @@ def notify(newd,origd):
 def sendMail(newd,origd):
     # creates SMTP session 
     
-    port = int(environ.get('PORT', 587))
-    print(port)
-    s = smtplib.SMTP('smtp.gmail.com', port) 
+    #port = int(environ.get('PORT', 587))
+    #print(port)
+    s = smtplib.SMTP('smtp.gmail.com', 587) 
     
     # start TLS for security 
     s.starttls() 
