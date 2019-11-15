@@ -1,0 +1,2637 @@
+var message="Access Denied!"; 
+document.onkeydown = function (e) { 
+    e = e || window.event;//Get event
+	if (e.keyCode == 123) {	//for F12 key
+        preventKeypress(e)
+    }
+	if (e.keyCode == 93) {	//for right key
+        alert(message)
+		return false;
+    }
+	//for control key
+    //e = e||window.event // IE support
+    var c = e.keyCode
+    var ctrlDown = e.ctrlKey||e.metaKey // Mac support
+
+    // Check for Alt+Gr (http://en.wikipedia.org/wiki/AltGr_key)
+    if (ctrlDown && e.altKey) return true
+    if (ctrlDown && e.shiftKey) return true
+
+    // Check for ctrl+c, v and f are allowed
+    else if (ctrlDown && (c>=32 && c<=40)) return true // for spce, pg up,pg down, end, home, left, right, up and down arrows
+    else if (ctrlDown && (c>=48 && c<=57)) return true // for 0 to 9
+    else if (ctrlDown && c==67) return true // c
+    else if (ctrlDown && c==70) return true // f
+    else if (ctrlDown && c==86) return true // v
+    else if (ctrlDown && c==80) return true // p
+    else if (ctrlDown && c==82) return true // r
+    else if (ctrlDown && c==88) return true // x
+    else if (ctrlDown && c==90) return true // z
+	if((c!=17) && (ctrlDown)){
+		preventKeypress(e)
+	}
+};
+function preventKeypress(e){
+	alert(message);
+	console.log(message);
+	e.preventDefault();
+	return false
+}
+function calculateTDS2(){  
+    docstatus='';
+    o = document.getElementById('txtdocstatus');
+    if (o) docstatus=o.value;
+    if (docstatus!='Active'){
+        alert('All calculations can be done only at Active stage...  \nNow it is in ['+docstatus+'] stage.');
+        return false;
+    }
+    d = parseFloat(document.getElementById('txtdebit').value);
+    c = parseFloat(document.getElementById('txtcredit').value);
+    tdspercent=parseFloat(document.getElementById('txttdspercent').value);
+    //tdsc=parseFloat(document.getElementById('txttdssc').value);
+    //tdscess=parseFloat(document.getElementById('txttdscess').value);
+    tot=d+c;
+	factor=1-((tdspercent/100)+(tdspercent*tdsc/10000)+(tdspercent*tdscess/10000));
+    tot = (Math.round((tot / factor)*100)/100);
+    tdsamt =  (Math.round((tot*tdspercent/100)*100)/100);
+    //tdsscamt =  (Math.round((tdsamt*tdsc/100)*100)/100);
+    //tdscessamt =  (Math.round((tdsamt*tdscess/100)*100)/100);
+    document.getElementById('txttdsamount').value=tdsamt;
+    // document.getElementById('txttdssurchargeamount').value=tdsscamt;
+    // document.getElementById('txttdscessamount').value= tdscessamt;
+    if(d>0) document.getElementById('txtdebit').value= tot;
+    if(c>0) document.getElementById('txtcredit').value= tot;
+
+}
+function calculateTDS(){
+    docstatus='';
+    o = document.getElementById('txtdocstatus');
+    if (o) docstatus=o.value;
+    if (docstatus!='Active'){
+        alert('All calculations can be done only at Active stage...  \nNow it is in ['+docstatus+'] stage.');
+        return false;
+    }
+    d = parseFloat(document.getElementById('txtdebit').value);
+    c = parseFloat(document.getElementById('txtcredit').value);
+	tot=Math.abs(d+c);
+	tdsded = 0;
+	if(document.getElementById('txttdsdedamount')) tdsded = document.getElementById('txttdsdedamount').value;
+	if(tdsded==0 || tdsded==''){
+		document.getElementById('txttdsdedamount').value=tot;
+		tdsded = tot;
+	} 
+	if(tdsded>tot){
+		mssg = 'Tds Amount('+tdsded+') is grater than Voucher Amount('+tot+')';
+		alert(mssg);
+		return false; 
+	}
+	tot = tdsded;
+	tds = 0;
+	tdssurch = 0;
+	tdscess = 0;
+	if(document.getElementById('txttdspercent')){
+		tds = parseFloat(document.getElementById('txttdspercent').value)*tot/100;
+		tds =tds+0.5;
+		tds  = parseInt(tds);
+		if(document.getElementById('txttdsamount')) document.getElementById('txttdsamount').value = tds;
+	}
+/*     if(document.getElementById('txttdssc')){
+		tdssurch = parseFloat(document.getElementById('txttdssc').value)*tds/100;
+		tdssurch =tdssurch+0.5;
+		tdssurch  = parseInt(tdssurch);
+		if(document.getElementById('txttdssurchargeamount')) document.getElementById('txttdssurchargeamount').value = tdssurch;
+	}
+    if(document.getElementById('txttdscess')){
+		tdscess  = parseFloat(document.getElementById('txttdscess').value)*tdssurch/100;
+		tdscess =tdscess+0.5;
+		tdscess  = parseInt(tdscess);
+		if(document.getElementById('txttdscessamount')) document.getElementById('txttdscessamount').value = tdscess;
+	}
+ */
+ setSelfSessionRefresh('txttdspercent,txttdsamount');//txttdssurchargeamount,txttdssc,txttdscess,txttdscessamount
+}
+function calculateServiceTax2(){
+    docstatus='';
+    o = document.getElementById('txtdocstatus');
+    if (o) docstatus=o.value;
+    if (docstatus!='Active'){
+        alert('All calculations can be done only at Active stage...  \nNow it is in ['+docstatus+'] stage.');
+        return false;
+    }
+    d = parseFloat(document.getElementById('txtdebit').value);
+    c = parseFloat(document.getElementById('txtcredit').value);
+    taxpercent=parseFloat(document.getElementById('txtservicetaxpercent').value);
+    cesspercent=parseFloat(document.getElementById('txtservicetaxcesspercent').value);
+    hecesspercent=parseFloat(document.getElementById('txtservicetaxhecesspercent').value);
+    tot = d+c;
+//    alert(tot);
+    if(taxpercent>0){
+ 	    factor=1-((taxpercent/100)+(taxpercent*(cesspercent+hecesspercent)/10000));
+        tot   = (Math.round((tot / factor)*100)/100);
+        taxamount =  (Math.round((tot*taxpercent/100)*100)/100);
+        taxcessamount =  (Math.round((taxamount*cesspercent/100)*100)/100);
+        taxhecessamount =  (Math.round((taxamount*hecesspercent/100)*100)/100);
+        document.getElementById('txtservicetaxamount').value=taxamount;
+        document.getElementById('txtservicetaxcessamount').value =taxcessamount;
+        document.getElementById('txtservicetaxhecessamount').value =taxhecessamount;
+        if(d>0) document.getElementById('txtdebit').value= tot;
+        if(c>0) document.getElementById('txtcredit').value= tot;
+    }
+}
+function calculateServiceTax(){
+    docstatus='';
+    o = document.getElementById('txtdocstatus');
+    if (o) docstatus=o.value;
+    if (docstatus!='Active'){
+        alert('All calculations can be done only at Active stage...  \nNow it is in ['+docstatus+'] stage.');
+        return false;
+    }
+    d = parseFloat(document.getElementById('txtdebit').value);
+    c = parseFloat(document.getElementById('txtcredit').value);
+    taxpercent=parseFloat(document.getElementById('txtservicetaxpercent').value);
+    cesspercent=parseFloat(document.getElementById('txtservicetaxcesspercent').value);
+    hecesspercent=parseFloat(document.getElementById('txtservicetaxhecesspercent').value);
+    tot = d+c;
+    //alert(tot);
+    if(taxpercent>0){
+        taxfactor=taxpercent+(taxpercent*(cesspercent+hecesspercent)/100) ;
+        taxfactor = 1+(taxfactor/100);
+        netamount=Math.round(tot*100/taxfactor)/100;
+        taxamount=Math.round(netamount*taxpercent);
+        taxamount=taxamount/100;
+        taxcessamount=Math.round(taxamount*cesspercent);
+        taxcessamount=taxcessamount/100;
+        taxhecessamount=Math.round(taxamount*hecesspercent);
+        taxhecessamount=taxhecessamount/100;
+        totalamount=netamount+ taxamount+taxcessamount+taxhecessamount;
+
+        diff=tot-totalamount;
+        diff=Math.round(diff*100)/100;
+        taxamount=taxamount+diff;
+        document.getElementById('txtservicetaxamount').value=taxamount;
+        document.getElementById('txtservicetaxcessamount').value =taxcessamount;
+        document.getElementById('txtservicetaxhecessamount').value =taxhecessamount;
+
+    }
+}
+
+
+//  goes to specific url....  generally linked to button
+
+function gourl(url){
+    document.location.href=url;
+}
+function setcol(col){
+    document.getElementById('pcolor').value=c;
+}
+function hiderIcon(){
+    elms = document.getElementsByTagName('*');
+    lx   = elms.length;
+    for (i=0;i<lx;i++){
+        if (elms[i].name){
+            if (elms[i].name.substr(0,9)=='hiderIcon') elms[i].style.display='none';
+        }
+    }
+}
+function swapImage(id){
+    o=document.getElementsByTagName(id);
+    if (o.src=='images/go.gif'){
+        o.src='images/go2.gif'
+    }else{
+        o.src='images/go.gif'
+    }
+}
+function enlargeMe(){
+    elms = document.getElementsByTagName('input');
+    lx = elms.length;
+    for (i=0;i<lx;i++){
+        if (elms[i].className=='plum_boxs') {
+            elms[i].className='plum_boxsBig'
+            }else{
+            elms[i].className='plum_boxs'
+        }
+    }
+    elms = document.getElementsByTagName('select');
+    lx = elms.length;
+    for (i=0;i<lx;i++){
+        if (elms[i].className=='plum_combo') {
+            elms[i].className='plum_comboBig'
+            }else{
+            elms[i].className='plum_combo'
+        }
+    }
+    elms = document.getElementsByTagName('textarea');
+    lx = elms.length;
+    for (i=0;i<lx;i++){
+        if (elms[i].className=='plum_textarea') {
+            elms[i].className='plum_textareaBig'
+            }else{
+            elms[i].className='plum_textarea'
+        }
+    }
+}
+function setcss(css){
+    elms = parent.frames[2].document.getElementsByTagName('tr');
+    lx = elms.length;
+    for (i=0;i<lx;i++){
+        if (elms[i].className==css) elms[i].style.backgroundColor=document.getElementById('pcolor').value;
+    }
+    document.getElementById(css).value=document.getElementById('pcolor').value;
+}
+function showHideDivs(id){
+    elms = document.getElementsByTagName('div');
+    lx = elms.length;
+    for (i=0;i<lx;i++){
+       elms[i].style.display=id
+    }
+}
+function setcss2(css){
+    if (css=='plum_boxs') elms = parent.frames[2].document.getElementsByTagName('text');
+    lx = elms.length;
+    for (i=0;i<lx;i++){
+        if (elms[i].className==css) elms[i].style.backgroundColor=document.getElementById('pcolor').value;
+    }
+    document.getElementById(css).value=document.getElementById('pcolor').value;
+    if (css=='plum_boxs') elms = parent.frames[4].document.getElementsByTagName('input');
+    if (css=='plum_combo') elms = parent.frames[4].document.getElementsByTagName('select');
+    if (css=='plum_button') elms = parent.frames[4].document.getElementsByTagName('button');
+    lx = elms.length;
+    for (i=0;i<lx;i++){
+        if (elms[i].className==css) elms[i].style.backgroundColor=document.getElementById('pcolor').value;
+    }
+    document.getElementById(css).value=document.getElementById('pcolor').value;
+}
+function clearData(objname){
+    obj=document.getElementById(objname) ;
+    obj.value=''
+}
+function manageDate(o,t,b,e,fb,fe){   //  Manages the date
+    if (o.value.length==6) o.value=o.value.substr(0,2)+'-'+o.value.substr(2,2)+'-'+o.value.substr(4,2);
+    if ( (o.value=='t') || (o.value=='T')) o.value=t;
+    if ( (o.value=='b') || (o.value=='B')) o.value=b;
+    if ( (o.value=='e') || (o.value=='E')) o.value=e;
+    if ( (o.value=='fb') || (o.value=='FB')) o.value=fb;
+    if ( (o.value=='fe') || (o.value=='FE')) o.value=fe;
+    // T - Today
+    // B - Month first
+    // E - Month End
+    // FB - Financial Begining
+    // FE - Financial End
+    //alert('1')
+    checkDate(o,'01-01-1901','31-12-2099');
+    dd = (o.value.substr(0,2));
+    mm = (o.value.substr(3,2));
+    yy = (o.value.substr(6,4));
+    ymd = (yy+'-'+mm+'-'+dd);
+    if ((ymd<'1901-01-01') || (ymd>'2099-12-31')){
+       //////////// o.value=t;
+        // alert ('Invalid Date..');
+		o.focus();
+		return true;
+    }
+    ctrl     = o.name.substr(0,3).toUpperCase();
+    ctrlname = o.name.toUpperCase().substr(3);
+
+}
+function lst2txt(objEvent,obj){
+    xname=obj.name;
+    txtname='txt'+xname.substr(3,20);
+    if(window.event){
+        iKeyCode = objEvent.keyCode;
+    }
+        else if(objEvent.which){
+        iKeyCode = objEvent.which;
+    }
+    if ((iKeyCode==13) || (iKeyCode==0)){
+        document.getElementById(txtname).value=obj.value;
+        divname='divlsx'+xname.substr(3,20);
+        objdiv = document.getElementById(divname)
+        objdiv.style.display='none';
+        objtxt=document.getElementById(txtname)
+        objtxt.focus()
+    }
+        objtxt=document.getElementById(txtname)
+        objtxt=document.getElementById(txtname)
+        objtxt.value=obj.value;
+}
+function txt2lst(objEvent,obj){
+    xname=obj.name;
+    txtname='txt'+xname.substr(3,20);
+    var iKeyCode;
+    if(window.event){
+        iKeyCode = objEvent.keyCode;
+    }
+        else if(objEvent.which){
+        iKeyCode = objEvent.which;
+    }
+    if ((iKeyCode==186) || (iKeyCode==0)){
+        divname='divlsx'+xname.substr(3,20);
+        objdiv = document.getElementById(divname)
+        objdiv.style.display='block';
+        lstname='lsx'+xname.substr(3,20);
+        obj2 = document.getElementById(lstname)
+        obj.value=obj2.value;
+        obj2.focus();
+    }
+}
+function checkDate(cont1,dlow,dhigh){
+    inDate=cont1.value
+    //  dlow and high ,indate format is dd-mm-yy
+    if (inDate==""){
+        inDate="00-00-0000"
+        return
+    }
+    dateStyle='DMY';
+    delimiter="-";
+    err="";
+    pos1=inDate.indexOf(delimiter) ; dd=parseInt(inDate.substr(0,pos1),10)
+    pos2=inDate.indexOf(delimiter,pos1+1) ; mm=parseInt(inDate.substr(pos1+1,(pos2-pos1-1)),10)
+    yy=parseInt(inDate.substr(pos2+1),10)
+    if (yy>0 && yy<100) yy=yy+2000
+    ddLimit=30
+    if (mm==2) ddLimit=28
+    if (mm==1 || mm==3 || mm==5 || mm==7 || mm==8 || mm==10 || mm==12) ddLimit=31
+    leap=parseInt(yy/4)*4
+    if (leap==yy && mm==2) ddLimit=29
+    if (dd<1 || dd>ddLimit || mm<1 || mm>12 || yy<1)  err="Invalid Date..."
+    if (err!="" && inDate!='00-00-0000'){
+        cont1.focus()
+        alert(err+" ["+dd+"-"+mm+"-"+yy+"]");
+        cont1.value=''
+        cont1.focus();
+        return false;
+        }else{
+            if(dd < 10) dd="0"+dd;
+            if(mm < 10) mm="0"+mm;
+            dmy=dd+'-'+mm+'-'+yy;
+            cont1.value=dmy
+            dmy = dmy2ymd(dmy);
+            dlow = dmy2ymd(dlow);
+            dhigh = dmy2ymd(dhigh);
+            if ((isNaN(dd)) || (isNaN(mm)) || (isNaN(yy))){
+                alert('Invalid Date.');
+                cont1.value=''
+                cont1.focus();
+                return false;
+            }
+            if (dmy<dlow){
+                alert('Valid Date Range is '+dlow+' to '+dhigh);
+                cont1.value=''
+                cont1.focus();
+                return false;
+            }
+            if (dmy>dhigh){
+                alert('Valid Date Range is '+dlow+' to '+dhigh);
+                cont1.value='';
+                cont1.focus();
+                return false;
+            }
+        return true;
+    }
+}
+function dmy2ymd(dmy){
+    temp = dmy.substr(6,4)+'-'+dmy.substr(3,2)+'-'+dmy.substr(0,2);
+    return temp;
+}
+function ymd2dmy(ymd){
+    temp = ymd.substr(8,2)+'-'+ymd.substr(5,2)+'-'+ymd.substr(0,4);
+    return temp;
+}
+function CheckEnterKey(objEvent,sess_sort,sess_page,tc_name){
+            var iKeyCode;
+            if(window.event){
+               iKeyCode = objEvent.keyCode;
+            }
+            else if(objEvent.which){
+                  iKeyCode = objEvent.which;
+            }
+            if(iKeyCode==13){
+            submitListPage(sess_sort,sess_page,tc_name);
+            }
+}
+function checkRange(msg,ctrl,v1,v2){
+    oval=parseFloat(document.getElementById(ctrl).value);
+    if ( (oval<v1) || (oval>v2) ){
+        alert(msg+". Valid Range value is: "+v1+" - "+v2);
+        document.getElementById(ctrl).focus();
+        return false;
+    }
+}
+function interControlRange(msg,ctrl1,ctrl2){
+    oval1=parseFloat(document.getElementById(ctrl1).value);
+    oval2=parseFloat(document.getElementById(ctrl2).value);
+    if ( (oval1>oval2) ){
+        alert(msg+". Valid Range value is: "+oval1+" must be les than "+oval2);
+        document.getElementById(ctrl1).focus();
+        return false;
+    }
+}
+//  This routing is checked befor any sibmission of the edit / insert forms
+    function formSubmit(button,frame,d1,d2,actionpage){
+        setSelfSessionRefresh('excisepercent,excisecesspercent,hecessexctaxpercent,vatpercent,cstpercent,totpercent,totcesspercent,servicetaxpercent,servicetaxcesspercent,hecesssertaxpercent,entrytaxpercent');
+        buttonName=button.name;
+		document.getElementById('editwaiterclock').style.display='block';
+        document.getElementById('submitBand').style.visibility='hidden'  // Protection against re submission
+        temp = window.document.f2;
+        bname=button.name;
+        if (bname=="Deleted"){
+            document.f2.reset();
+            var ans;
+			if(document.getElementById('txtquantity')){
+                qnty=document.getElementById('txtquantity').value;
+                if(qnty>0){
+                    document.getElementById('editwaiterclock').style.display='none';
+                    document.getElementById('submitBand').style.visibility='visible'  // Protection against re submission
+                    alert('Quantity is present hence cannot be deleted');
+                    return false
+                }
+            }
+            ans=window.confirm('Shall I Delete?')
+            if (!ans){
+                document.getElementById('editwaiterclock').style.display='none';
+                document.getElementById('submitBand').style.visibility='visible';
+                return false
+            }
+        }
+        var len1=temp.elements.length;
+        str_alert="";
+		cst_vat_chk = ""
+        errorFound="NO"
+        symbol1="&&&&&&&";
+        symbol2="'";
+        var mytable="";
+        mytable=document.getElementById('tbn').value;
+        mytablejv=document.getElementById('jvtb').value;
+        for (var i=0;i<len1;i++) {
+            ctrl = temp.elements[i].name.substr(0,3);
+			// validation for empty space for the mandatory fields   
+			valu=temp.elements[i].value;
+			valu=trimAll(valu);
+			tempv = (valu.substr(valu.length-5,5));  //  Indicate space[OK] or ..... five dots
+            if (tempv=='.....') temp.elements[i].value='';   //  to handle prompts
+            if ((mytable!="reports") && (mytable!="plum_lookup") && (mytable!="plum_fw_pagehead") && (mytable!="plum_fw_pagefields") && (mytable!="plum_fw_pagelinks") && (mytable!="plum_template") &&
+			(mytablejv!="_GCfe_0u_GY350S5CRE") && (mytablejv!="_GCfe_0u_GY35t5YR") && (mytablejv!="_m5G1mXE") && (mytablejv!="_GCfe_C11TfG") && (mytablejv!="_GCfe_0u_GY35CSqTE") && (mytablejv!="_GCfe_X5eGCYX5")){
+               if (valu.search(symbol1)!=-1) str_alert = str_alert+symbol1+" is present for "+temp.elements[i].getAttribute('caption')+"\n";
+               if (valu.search(symbol2)!=-1 && temp.elements[i].id!='txttexteditor') str_alert = str_alert+symbol2+" is present for "+temp.elements[i].getAttribute('caption')+"\n";
+            } 
+            if ( (temp.elements[i].oldvalue != valu) && (temp.elements[i].pickcontrol==1) && (tempv!=' [OK]')) str_alert = str_alert + "Data in ["+temp.elements[i].caption+"] appears not valid...\n";
+            if ((temp.elements[i].pickcontrol==1) && (tempv==' [OK]')) {
+                temp.elements[i].disabled=false;
+            }
+			// cst/vat checking 
+			if(temp.elements[i].name=='txtcstpercent' || temp.elements[i].name=='txtvatpercent'){
+				var cst; var vat;
+				if(document.getElementById('txtcstpercent')) cst = document.getElementById('txtcstpercent').value;
+				if(document.getElementById('txtvatpercent')) vat = document.getElementById('txtvatpercent').value;
+				if(cst>0 && vat>0){
+					cst_vat_chk = 'CST and VAT both are entered <br> Please enter CST or VAT';
+					focusfield = temp.elements[i];
+				}
+			}
+		
+			
+            if (temp.elements[i] && ( (ctrl=='txt') || (ctrl=='cmb')  || (ctrl=='txd')  || (ctrl=='fin') ) ){
+                if (ctrl=='fin'){
+                     dt = valu.substr(6,4)+'-'+valu.substr(3,2)+'-'+valu.substr(0,2);
+                     if ((dt<d1) || (dt>d2)) str_alert = str_alert+temp.elements[i].caption+"/"+temp.elements[i].name+" must be within "+d1+" to "+d2+" Only..\n";
+                }
+                if (valu=='' && temp.elements[i].getAttribute('mandatory')==1 ) {
+                    str_alert = str_alert+temp.elements[i].getAttribute('caption')+' is required<br>\n';
+                    focusfield = temp.elements[i];
+					openTab("General");
+                }
+				if(temp.elements[i].name=='txtentitycode' || temp.elements[i].name=='txtinventorycode' || temp.elements[i].name=='txtaccountsmastercode'){
+					if(valu=='None' && temp.elements[i].getAttribute('mandatory')==1){
+						str_alert = str_alert+temp.elements[i].getAttribute('caption')+' is required<br>\n';
+						openTab("General"); 
+					}
+				}
+                if (errorFound=='NO') {
+                    errorFound='YES';
+                }
+            }
+        }
+		if(document.getElementById('txttdspercent')){
+			if(document.getElementById('txttdspercent').value>0 && (document.getElementById('txttdsamount').value==0 || document.getElementById('txttdsamount').value=='')) {
+				str_alert = str_alert + 'TDS Amount not calculated.<br>\n';
+			}
+		}
+ 		if(mytable=='_R1kfe5qXCSq5E' || mytable=='_R1kfe5qXCSq5EGfm'){
+			xq = 0;
+			xrejq = 0;
+			if(document.getElementById('txtquantity')) xq = parseFloat(document.getElementById('txtquantity').value);
+			if(document.getElementById('txtrejectedquantity')) xrejq = parseFloat(document.getElementById('txtrejectedquantity').value);
+			if(xq<xrejq && xrejq>0){
+				str_alert = str_alert +'Rejected quantity cannot be greater than Quantity';
+			}	
+		}
+		//incase negative amounts entered in debit or credit
+		if(document.getElementById('txtdebit') && document.getElementById('txtcredit')){
+			dbt = document.getElementById('txtdebit');
+			crt = document.getElementById('txtcredit');
+			drfc = document.getElementById('txtdebitfc');
+			crfc = document.getElementById('txtcreditfc');
+			if(dbt.value<0)	{ 
+				crt.value 	= Math.abs(dbt.value);	dbt.value = 0;	
+				crfc.value 	= Math.abs(drfc.value);	drfc.value = 0;	
+			}
+			if(crt.value<0)	{
+				dbt.value	= Math.abs(crt.value);	crt.value = 0;
+				drfc.value	= Math.abs(crfc.value);	crfc.value = 0;	
+			}
+			if(dbt.value>0 && crt.value>0)	str_alert = str_alert+'Both (Debit / Credit) are not allowed.';
+		}
+		
+		// Check valid file Name
+		if(document.getElementById('userfile')){
+			filename = document.getElementById('userfile').value;
+			if(filename.indexOf('<')>-1 || filename.indexOf('>')>-1 || filename.indexOf('/')>-1 || filename.indexOf(';')>-1 || filename.indexOf('`')>-1 || filename.indexOf('!')>-1 || filename.indexOf("'")>-1) str_alert = str_alert +'Special Characters (< > / : ;  `!) not allowed in File Name.';
+			
+		}
+
+		str_alert = str_alert+cst_vat_chk; 
+        if(str_alert != ''){
+            window.scrollBy(0,-1000);
+            document.getElementById('editwaiterclock').style.display='none';
+			document.getElementById('editsideHeader').innerHTML=str_alert;
+            document.getElementById('editsideHeader').style.display='block';
+            document.getElementById('editsideHeader').style.backgroundColor='FFAA00';
+            document.getElementById('editsideHeader').style.color='000000';
+            document.getElementById('submitBand').style.visibility='visible';
+            if (focusfield) focusfield.focus();
+            return false;
+        }else{
+            for (var i=0;i<len1;i++) {
+                if ((temp.elements[i]) && (temp.elements[i].type=='button') && (bname!=temp.elements[i].name) && (temp.elements[i].id == '')  && (bname!='hiddeninsert')) temp.elements[i].value="";
+            }
+
+            FormIsValid=FormValidate();
+            if (FormIsValid){
+				if (actionpage=='' || actionpage=='undefined') actionpage='plum_fw_action.php';
+				if (!actionpage) actionpage='plum_fw_action.php';
+			    document.getElementById('submitBand').style.visibility='hidden';
+                txurl=actionpage+'?parentFrame='+frame+'&'+button.name+'=1';
+                window.document.f2.action = txurl;
+                myid=document.getElementById('id')
+                if (myid.value=='0')  window.document.f2.target='plum_submiter' ;
+                if (bname!='hiddeninsert') {
+                    if(document.getElementById('maintable')) document.getElementById('maintable').style.display='none';
+                    if(document.getElementById('bottomband')) document.getElementById('bottomband').style.display='none';
+                    if(document.getElementById('messageband')) document.getElementById('messageband').style.display='block';
+                    window.document.f2.submit();
+                }
+            }else{
+               document.getElementById('submitBand').style.visibility='visible';
+			   document.getElementById('editwaiterclock').style.display='none';
+               return false;
+            }
+			
+        }
+        return true;
+    }  // end of form submit
+function clipcopyForm(){  //  Function used for copying and pasting the data in the controls in the edit / add forms
+   var elms = document.f2.elements.length;
+   var copystr="";
+   for (i=0;i<elms;i++){
+       var thisele = document.f2.elements[i];
+       if (thisele.type =='text' || thisele.type =='textarea' || thisele.type =='select-one')
+            copystr = copystr + thisele.name + '|' +  thisele.value + '\n'; //
+   }
+    window.clipboardData.setData("Text",copystr)
+}
+function clippasteForm(){    //  Function used for copying and pasting the data in the controls in the edit / add forms
+   var copystr= window.clipboardData.getData("Text") ;
+   myarray = copystr.split('\n');
+   var elms = myarray.length;
+   for (i=0;i<elms;i++){
+        myarray2 = myarray[i].split('|');
+        obj=document.getElementById(myarray2[0]);
+        if (obj){
+            if(obj.autofill){
+                }else{
+                   if (obj) obj.value = myarray2[1];
+                }
+            }
+        }
+}
+function allowOnly(ctrl,typ,upp){
+    if (typ==1) allow='abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ.,-@#$%&*(){}0123456789'
+    if (typ==2) allow='ABCDEFGHIJKLMNOPQRSTUVWXYZ.,-@#$%&*(){}0123456789 '
+    if (typ==3) allow='0123456789.'
+    if (typ==4) allow='0123456789-'
+    var w='';
+    if (upp==1) ctrl.value=ctrl.value.toUpperCase();
+    if (upp==2) ctrl.value=ctrl.value.toLowerCase();
+    for (i=0;i<ctrl.value.length;i++){
+        x=ctrl.value.charAt(i);
+        if(allow.indexOf(x,0) != -1)
+        w+=x;
+    }
+    ctrl.value=w;
+}
+function allowAlphaNumericOnly(ctrl,upp){
+    allow='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/'
+    var w='';
+    if (upp==1) ctrl.value=ctrl.value.toUpperCase();
+    if (upp==2) ctrl.value=ctrl.value.toLowerCase();
+    for (i=0;i<ctrl.value.length;i++){
+        x=ctrl.value.charAt(i);
+        if(allow.indexOf(x,0) != -1)
+        w+=x;
+    }
+    ctrl.value=w;
+}
+	function makeUpper(ctrl){
+		ctrl.value=ctrl.value.toUpperCase();
+	}
+    function AllowAlphaUpp(objEvent){
+            var iKeyCode;
+            if(window.event){
+               iKeyCode = objEvent.keyCode;
+            }
+            else if(objEvent.which){
+                  iKeyCode = objEvent.which;
+            }
+            if(((iKeyCode>=1 && iKeyCode<=31) || (iKeyCode>=33 && iKeyCode<37) ||
+               (iKeyCode>=33 && iKeyCode<=36) || (iKeyCode>=42 && iKeyCode<44) ||
+               (iKeyCode>=91 && iKeyCode<=94) ||
+               (iKeyCode==96) || (iKeyCode>=123 && iKeyCode<=255)) && (iKeyCode!=16) && (iKeyCode!=13)){
+                      alert('Alpha Only-' + iKeyCode);
+                      return false;
+            }
+            if (iKeyCode>=97 && iKeyCode<=122) {
+                 objEvent.keyCode = iKeyCode - 32;
+            }
+            return true;
+    }
+     function AllowAlphaLow(objEvent){
+            var iKeyCode;
+            if(window.event){
+               iKeyCode = objEvent.keyCode;
+            }
+            else if(objEvent.which){
+                  iKeyCode = objEvent.which;
+            }
+            if( (iKeyCode>=1 && iKeyCode<=31) || (iKeyCode>=33 && iKeyCode<37) ||
+               (iKeyCode>=33 && iKeyCode<=36) || (iKeyCode>=42 && iKeyCode<44) ||
+               (iKeyCode>=91 && iKeyCode<=94) ||
+               (iKeyCode==96) ||(iKeyCode>=123 && iKeyCode<=255)){
+                      alert('Alpha Only-' + iKeyCode);
+                      return false;
+            }
+            if (iKeyCode>=65 && iKeyCode<=90) {
+                 objEvent.keyCode = iKeyCode + 32;
+            }
+            return true;
+    }
+
+    // Java script Function that will allow only Numeric characters
+    function AllowNumeric(objEvent,obj){
+			valu=obj.value;
+			valuedecimals=valu.split('.');
+			decimals = valuedecimals.length;
+			var iKeyCode;
+			if(window.event){
+               iKeyCode = objEvent.keyCode;
+            }
+            else if(objEvent.which){
+                  iKeyCode = objEvent.which;
+            }
+			if  (iKeyCode==46 && decimals>1)   {  //  46 is decimal && decimals>1
+				alert('Only one decimal allowed...');
+				iKeyCode=0;
+				return false;
+			}
+			objid = '';
+			if(obj) objid= obj.id;
+            if((iKeyCode<=1 && iKeyCode>=7) || (iKeyCode>=9 && iKeyCode<=45) || (iKeyCode>=58 && iKeyCode<=255)){
+                if (iKeyCode==45 && objid!='' && objid!='txtdebitfc' && objid!='txtcreditfc' && objid!='txtdebit'
+					&& objid!='txtcredit' && objid!='txtadd_arrears' && objid!='txtadd_hraarrears' && objid!='txtadd_daarrears'
+					&& objid!='txtadd_taarrears' && objid!='txtrec_pensionarrears' && objid!='txtrec_pandt' && objid!='txtrec_deptaladv' 
+					&& objid!='txtded_qtrrent' && objid!='txtpen_ded_commutation' && objid!='txtpen_add_drarrears'
+					&& objid!='txtpen_add_mediallow')  {
+                    alert(' Negative Values are not allowed...');
+                    iKeyCode=0;
+                     return false;
+                } 
+			
+                if (iKeyCode!=13 && iKeyCode!=45) {
+                    alert('Numbers Only');
+                    iKeyCode=0;
+                     return false;
+                }
+            }
+            return true;
+    }
+
+    // Java script Function that will allow only 0-9	//no dots or any special characters
+    function AllowNumbersOnly(objEvent,obj){
+		var iKeyCode;
+		e = objEvent || window.event
+		if(window.event){
+		   iKeyCode = objEvent.keyCode;
+		}else if(objEvent.which){
+			iKeyCode = objEvent.which;
+		}
+		if(iKeyCode>=48 && iKeyCode<=57)	return true;
+		// Allow: backspace, delete, tab, escape, enter 
+		allowdKeys = [8, 9, 27, 13, 110, 190];
+		if(allowdKeys.indexOf(iKeyCode) !== -1 ||
+			// Allow: Ctrl+A
+			(iKeyCode == 65 && e.ctrlKey === true) ||
+			// Allow: Ctrl+C
+			(iKeyCode == 67 && e.ctrlKey === true) ||
+			// Allow: Ctrl+X
+			(iKeyCode == 88 && e.ctrlKey === true) ||
+			// Allow: home, end, left, right
+			(iKeyCode>=35 && iKeyCode<=40))	return true;
+		
+		alert('Numbers Only');
+		iKeyCode=0;
+		return false;
+    }
+    // Java script Function that will allow only AllowAlphaNumeric characters
+    // like A-Z,a-z,Brackets,Hypen,Underscore and Singel Quotes
+    function AllowAlpha(objEvent){
+            if(window.event){
+               iKeyCode = objEvent.keyCode;
+            }
+            else if(objEvent.which){
+                  iKeyCode = objEvent.which;
+            }
+        if ((iKeyCode==13) || (iKeyCode==16)) {  //Enter or shift keys
+            return true;
+        }
+            if( (iKeyCode>=1 && iKeyCode<=12) || (iKeyCode>=14 && iKeyCode<=31)  || (iKeyCode>=33 && iKeyCode<37) ||
+               (iKeyCode>=33 && iKeyCode<=36) || (iKeyCode>=42 && iKeyCode<44) ||
+               (iKeyCode>=91 && iKeyCode<=94) ||
+               (iKeyCode==96) ||(iKeyCode>=123 && iKeyCode<=255 )){
+                alert('Alpha Only-');
+                return false;
+            }
+            return true;
+    }
+oldObjName='foo'
+function showInline(id,url){
+    v1='inline'+id
+    obj=document.getElementById(v1)
+    oldObj=document.getElementById(oldObjName)
+    if (oldObj) oldObj.innerHTML=""
+    oldObjName= v1;
+    url=url+'&inline=1'
+    obj.innerHTML = "<iframe class=boxs  style=' height:250; border : solid 2px #c6c6c6;' width=100% FRAMEBORDER=no  id='inline' name='inline' src='"+url+"'></iframe>";
+}
+function hideInline(id){
+    v1='inline'+id
+    obj=parent.document.getElementById(v1)
+    obj.innerHTML = "";
+}
+        function dullObject(objName,opacity){
+            document.getElementById(objName).style.filter='alpha(opacity='+opacity+')';
+        }
+
+    function toggleDisplay(objId){    // from one window to parent Toggles the display of any object display
+        //obj=parent.document.getElementById(objId)
+        obj=document.getElementById(objId)
+        if (obj.style.display=='block') {
+           obj.style.display='none'
+           }else{
+           obj.style.display='block';
+           }
+    }
+    function toggleDisplay2(objId){    // Toggles the display of any object display
+        obj=document.getElementById(objId)
+        if (obj.style.display=='inline') {
+           obj.style.display='none';
+           }else{
+           obj.style.display='inline';
+           }
+    }
+    function xtoggleDisplay2(objId){    // Toggles the display of any object display
+        obj=document.getElementById(objId)
+        if (obj.style.display=='block') {
+           obj.style.display='none';
+           }else{
+           obj.style.display='block';
+           }
+    }
+
+    function toggleDisplay3(objId,fr){    // Toggles the display of any object display
+        var elementsCount=0;
+        if (fr=='main') elms = document.getElementsByTagName('div');
+        if (fr!='main') elms = parent.parent.window.document.getElementsByTagName('div');
+        elementsCount =   elms.length
+        for (i=0;i<elementsCount;i++){
+           controlName="";
+            if (elms[i]){
+                controlName=elms[i].id;
+                XX=controlName.substr(0,2);
+                if ((XX=='XX') && (objId!=controlName)) {
+                    elms[i].style.display='none';
+                }
+            }
+        }
+        if (objId!='none')toggleDisplay2(objId)    // Toggles the display of any object display
+    }
+
+
+    //  Data picker window opening
+    function showDataPicker(obj,typ,tableName,focusField){
+        if (obj.value=="") return;
+        safeData=obj.value;
+        gross=0;
+        executedquantity=0;
+        if (tableName=='document' ){  // Lines already present....So the Customer can not be changed.
+            if(document.f2.txtgrossvalue) gross = parseInt(document.f2.txtgrossvalue.value)
+            if (gross>0){
+                obj.value = safeData;
+                alert ("Lines already present....\nSo the Customer can not be changed.")
+                document.f2.reset()
+                return false
+            }
+        }
+
+        if ((tableName=='documentlines')  && (obj.name == 'txtinventorycode')){  // Lines already present....So the Customer can not be changed.
+            if(document.f2.txtexecutedquantity) executedquantity = parseInt(document.f2.txtexecutedquantity.value)
+            if (executedquantity>0){
+                obj.value = safeData;
+                alert ("Quantity partially executed....\nSo the Product can not be changed.")
+                document.f2.reset()
+                return false
+            }
+        }
+
+
+        caption=obj.name;
+        v=obj.value;
+        obj=document.getElementById('datapicker');    // datapicker
+        if(obj)obj.style.display='block';
+        obj=document.getElementById('datapickerFrame');    // datapicker
+        filter='';
+        if (document.getElementById('datapickerFilter')) filter = document.getElementById('datapickerFilter').options( document.getElementById('datapickerFilter').selectedIndex).text;
+        obj.src='plum_fw_datapicker.php?_ty='+typ+'&_dp='+caption+'&_dpv='+v+'&tabl='+tableName+'&focus='+focusField+'&datapickerFilter='+filter
+    }
+
+
+
+function CheckTheBox(v1,img){
+    obj=document.getElementById(v1);
+    obj2=document.getElementById(img);
+    if(obj.checked){
+      obj.checked=0
+       obj2.src='images/bulletgrey.gif'
+      }else{
+       obj.checked=1;
+       obj2.src='images/bullet.gif'
+       }
+}
+var oldDropCombo='';
+function showPopdown(id){
+    obj=document.getElementById(oldDropCombo)
+    if (obj) obj.style.display='none'
+    v='drop'+id
+    obj=document.getElementById(v)
+    obj.style.display='block'
+    oldDropCombo=v;
+}
+function hidePopdown(id){
+    v='drop'+id
+    obj=document.getElementById(v)
+    obj.style.display='none'
+}
+
+function openURL(url,params){
+//    if (params==undefined ) params="";
+  myWindow =   window.open(url,"Editor",params); // height=430 width=690 left=100 top=200 scrollbars=0 resizable=1
+  myWindow.focus();
+}
+function openDebits(accCode){   //  USed for bank / cash receipts
+    url="plum_pickdebit.php?cus="+accCode;
+    window.open(url,"Editor","height=430 width=690 left=100 top=200 scrollbars=0 resizable=1")
+}
+function openLookup(url){
+    window.open(url,"Editor","height=600 width=400 left=100 top=100 scrollbars=1 resizable=0 ")
+}
+function openLookup1(url){//used in miniphpmyadmin
+    window.open(url,"Editor","height=450 width=450 left=200 top=200 scrollbars=1 resizable=0 ")
+}
+function openupload(url){
+    window.open(url,"Editor","height=200, width=400 left=200 top=200  resizable=0,toolbar=0,location=0,directories=0,status=0,menubar=0"); //scrollbars=0
+}
+function pushToHidden(){
+    offlineDataLimit=50;
+    counter = parseInt(frames['batchinsert'].document.hiddeninsert.counter.value);
+    EditCounter = parseInt(frames['batchinsert'].document.hiddeninsert.EditCounter.value);
+    if (counter > offlineDataLimit) {
+        alert("Off line data is limited to "+offlineDataLimit+" records only");
+        return false;
+    }
+    if(formSubmit(hinsert.document.hiddeninsert,'data')) {
+        var elms = document.f2.elements;
+        txcontrol = 'hiddendata'+counter;
+        if(EditCounter!=99)  txcontrol = 'hiddendata'+EditCounter;
+        discontrol = 'dis'+counter;
+        if(EditCounter!=99)  discontrol = 'dis'+EditCounter;
+        obj=frames['hinsert'].document.getElementById(txcontrol);
+        objDis=frames['hinsert'].document.getElementById(discontrol);
+        obj.value="";
+        objDis.value="";
+        elementsCount =   elms.length
+        for (i=0;i<=elementsCount;i++){
+            ctrl='xxx';
+            try{
+                obj.value = obj.value+elms[i].name+"[=]"+elms[i].value+"[~]";
+                if (elms[i].name.substr(0,3)=='txt') objDis.value = objDis.value+elms[i].caption+"="+elms[i].value+";";
+                }catch(err) {
+                //  Just bypassing
+            }
+        }
+        if (EditCounter==99) frames['hinsert'].document.hiddeninsert.counter.value=counter+1;
+        document.f2.reset();
+        frames['batchinsert'].document.hiddeninsert.EditCounter.value=99;
+    }
+    document.getElementById('submitBand').style.display='block'
+}
+function showHiddenData(var1){
+    txcontrol = 'hiddendata'+var1;
+    obj=document.getElementById(txcontrol);
+    temp=obj.value;
+    ar1= temp.split("[~]")
+    elements=ar1.length;
+    EditControl=document.hiddeninsert.EditCounter;
+    EditControl.value=var1;
+    for (i=0;i<elements;i++){
+        nameValue = ar1[i];
+        arr2=nameValue.split("[=]");
+        object1 = parent.document.getElementById(arr2[0]);
+        objName='';
+        try {
+            objName = object1.name;
+        }catch(err){
+        }
+        first3=objName.substr(0,3);
+        if ((first3=='txt') || (first3=='cmb')) object1.value= arr2[1];
+    }
+}
+function enlargeme(txaCtrl){
+    o=document.getElementById('txt'+txaCtrl);
+    if (o.style.width=='290px'){
+        o.style.height=70;
+        o.style.width=200;
+    }else{
+        o.style.height=160;
+        o.style.width=290;
+    }
+}
+function removeHiddenData(var1){
+    txcontrol = 'hiddendata'+var1;
+    document.getElementById(txcontrol).value='';
+    txcontrol = 'dis'+var1;
+    document.getElementById(txcontrol).value='';
+}
+function clearOK(picControl){
+return false;
+    o=document.getElementById('txt'+picControl);
+    valu=o.value;
+    tempv = valu.substr((valu.length-5),5);
+    if (tempv==" [OK]") o.value=valu.substr(0,(valu.length-5))
+}
+// ----------------  Functions for fading etc
+var timeoutID;
+var opacity;
+var fadingObject;
+var fadingObjectHeight;
+function fadeObject(objName){
+    fadingObject = document.getElementById(objName);
+    if (!fadingObject) fadingObject =  objName;
+    opacity = 10;
+    fadingObjectHeight = parseInt(fadingObject.style.height);
+    fadingObject.style.filter = "Alpha(Opacity=" + opacity + ")";
+    fadingObject.style.display='block'
+    timeoutID = setInterval("setOpacity()",5)
+}
+function setOpacity(){
+    opacity = opacity+15
+    fadingObject.style.filter = "Alpha(Opacity=" + opacity + ")";
+    if (opacity>=100)      clearInterval(timeoutID)
+}
+baseopacity=1;
+var imgobj;
+function slowhigh(which2){
+    which2=document.getElementById(which2);
+    imgobj=which2;
+    alert(imgobj)
+    imgobj.style.display='block'
+    browserdetect=which2.filters? "ie" : typeof which2.style.MozOpacity=="string"? "mozilla" : ""
+    instantset(baseopacity)
+    highlighting=setInterval("gradualfade(imgobj)",10)
+}
+function slowlow(which2){
+    which2=document.getElementById(which2);
+    cleartimer()
+    instantset(baseopacity)
+    imgobj.style.display='none'
+}
+function instantset(degree){
+    if (imgobj) imgobj.filters.alpha.opacity=degree
+}
+function cleartimer(){
+    if (window.highlighting) clearInterval(highlighting)
+}
+function gradualfade(cur2){
+    if (cur2.filters.alpha.opacity<100)
+    cur2.filters.alpha.opacity+=2
+    else if (window.highlighting)
+    clearInterval(highlighting)
+}
+function trimAll(sString){
+    while (sString.substring(0,1) == ' '){
+        sString = sString.substring(1, sString.length);
+    }
+    while (sString.substring(sString.length-1, sString.length) == ' '){
+        sString = sString.substring(0,sString.length-1);
+    }
+return sString;
+}
+    function centerMe(w,h){
+        sw = screen.availWidth;
+        sh = screen.availHeight;
+        window.moveTo(parseInt((sw-w)/2),parseInt((sh-h)/2))
+        window.resizeTo(w,h)
+    }
+
+
+function emailcheck(obj) {
+    str=obj.value;
+    str=trimAll(str);
+    obj.value=str;
+    if (str=='') return true;
+    var at="@"
+    var dot="."
+    var lat=str.indexOf(at)
+    var lstr=str.length
+    var ldot=str.indexOf(dot)
+    var err=''
+    if (str.indexOf(at)==-1)                                                    err = "Invalid E-mail ID"
+    if (str.indexOf(at)==-1 || str.indexOf(at)==0 || str.indexOf(at)==lstr)     err = "Invalid E-mail ID"
+    if (str.indexOf(dot)==-1 || str.indexOf(dot)==0 || str.indexOf(dot)==lstr)  err = "Invalid E-mail ID"
+    if (str.indexOf(at,(lat+1))!=-1)                                            err = "Invalid E-mail ID";
+    if (str.substring(lat-1,lat)==dot || str.substring(lat+1,lat+2)==dot)       err = "Invalid E-mail ID"
+    if (str.indexOf(dot,(lat+2))==-1)                                           err = "Invalid E-mail ID"
+    if (str.indexOf(" ")!=-1)                                                   err = "Invalid E-mail ID"
+    if (err==''){
+        return true
+    }else{
+        // alert ("Invalid Email..  Please correct");
+        obj.value='';
+        obj.focus();
+        return false
+    }
+   }
+    function setBullet(low,high,valu,ti,ic,idx){
+        temp=document.getElementById('divx'+idx);
+        mytop = parseInt(temp.style.top);
+        vSafe        = valu;
+        range        = high-low;
+        margin       = range/2;
+        lowerLimit   = low - margin;
+        higherLimit  = high + margin;
+        fullRange    = higherLimit-lowerLimit;
+        lowestAngle  = -30;
+        highestAngle = 210;
+        degreePerValue = 240/fullRange;
+        value = Math.min(valu,higherLimit);
+        value = Math.max(valu,lowerLimit);
+        centerX = 75;  //  For R-Theta graf
+        centerY = 240;
+        yfactor=1.8
+        radius=85;
+        angle = ((value-lowerLimit)*degreePerValue) - 30;
+        angle = Math.max(angle,-30)
+        angle = Math.min(angle,210)
+        radians=angle*22/(7*180);
+        locY =  radius - parseInt(radius*Math.sin(radians))  - centerX ;
+        locX =  radius - parseInt(radius*Math.cos(radians)) - centerY ;
+        locY=locY*yfactor;
+        obj=document.getElementById('b1'+idx)
+        obj.style.top=locY ; obj.style.left=locX;
+        obj=document.getElementById('t0'+idx) ;
+        obj.style.top=-55 ; obj.style.left=100;   obj.innerHTML=vSafe;
+        obj=document.getElementById('t1'+idx) ;
+        obj.style.top=-85 ;     obj.style.left=65;         obj.innerHTML='<font size=2><b>'+low ;
+        obj=document.getElementById('t2'+idx) ;
+        obj.style.top=-95 ;     obj.style.left=135;         obj.innerHTML='<font size=2><b>'+high ;
+        obj=document.getElementById('t3'+idx) ;
+        obj.style.top=-155 ;     obj.style.left=100;         obj.innerHTML='<font size=2><b>'+ti ;
+        obj=document.getElementById('t4'+idx) ;
+        obj.style.top=-80 ;     obj.style.left=100;         obj.innerHTML='<font size=1><b>'+ic ;
+    }
+    function getWindowWidth(){
+        if (navigator.appName=='Netscape') {
+            winW = window.innerWidth;
+            winH = window.innerHeight;
+        }
+        if (navigator.appName.indexOf('Microsoft')!=-1) {
+            winW = document.body.offsetWidth;
+            winH = document.body.offsetHeight;
+        }
+        return winW;
+    }
+    function getBalanceQnty(){
+        icode = document.getElementById('txtinventorycode').value;
+        ajax('plum_fw_ajax.php','balance','getBalanceQnty,'+icode,9);
+    }
+    function getDaysDebits(){
+        accno = document.getElementById('txtaccountsmastercode').value.replace(',','~');
+        today = document.getElementById('findocumentdate').value;
+        debit = document.getElementById('txtdebit').value;
+        doccode = document.getElementById('txtdocumentnoscode').value.replace(',','~');
+        doctype = document.getElementById('txtdocumenttype').value.replace(',','~');
+        ajax('plum_fw_ajax.php','ajreply','getDaysDebits,'+accno+','+today+','+debit+','+doctype+','+doccode,9);
+    }
+    function getNegativeCash(){
+        accno = document.getElementById('txtaccountsmastercode').value.replace(',','~');
+        debit = document.getElementById('txtdebit').value;
+        doccode = document.getElementById('txtdocumentnoscode').value.replace(',','~');
+        ajax('plum_fw_ajax.php','ajreply','getNegativeCash,'+debit+','+doccode,9);
+    }
+    function getCreditCredentials(){
+        ecode = document.getElementById('txtentitycode').value;
+        ajax('plum_fw_ajax.php','ajreply','getCreditCredentials,'+ecode,9);
+    }
+
+   function checkOrderLimits(currrow){
+        elms = document.getElementsByTagName('input');
+        tvalue=0;
+        tqty = 0;
+        obj = document.getElementById('parent'+currrow);
+        id  = document.getElementById('id'+currrow).value;
+        xparent =  obj.value; //  order id
+        parentid = document.getElementById('parentid').value;
+        dcid = parentid;   //  DC id
+        for (i=0;i<100;i++){
+            ptemp = 'parent'+i;
+            if (document.getElementById(ptemp)){
+                temp = document.getElementById(ptemp).value;
+                if ((xparent == temp) ){
+                    rate = parseFloat(document.getElementById('rate'+i).value);
+                    qnty = parseFloat(document.getElementById('req'+i).value);
+                    if (isNaN(rate)) rate = 0;
+                    if (isNaN(qnty)) qnty = 0;
+                    tvalue = tvalue + (rate*qnty);
+                    tqty = tqty + qnty;
+                }
+            }
+        }
+        document.getElementById('ajaxreply').value =id+'Qty:'+tqty+'; Value:'+tvalue;
+        ajax('plum_fw_ajax.php','ajaxreply','checkOrderLimits,'+xparent+','+dcid+','+tqty+','+tvalue,9);
+  }
+    //  Ajax related stuff
+    var AJAXreply;
+    AJAXreply="";
+    var xmlHttp;
+    var myCtrl;
+    var tooltipx;
+    var rowid;    //  filled by the ajax component bubble.js see ajax function at bottom
+    //  _page - the php page which has the function fenerally plum_fw_ajax.php
+    //  _ctrl - the contro (div) to be filled up with the return contrny
+    //  params - the method to be called along with the params separated by comma
+    //  The row id (global variable defined in plumjs.js) is filled here
+    //  tooltip=1 means the tooltip will be set
+    function ajax(_page,_ctrl,_params,ttip){
+        if (_ctrl=='addsecurity'){         //  For additional security pages
+            slv = document.getElementById('addsecuritylevel').value;
+            pwd = document.getElementById('addsecuritytxt').value;
+            _params='addsecurity,'+slv+','+pwd;
+
+        }
+        if (_page=='') return;
+        temp1 = _page.indexOf("?");
+        if((temp1<0) && (_page!='')) _page=_page+'?xx=1';   //  Just a request sending safety
+        //  if the tooltip is there no nee to get ajax again
+        if (ttip=='1' &&  document.getElementById(_ctrl).title!='') return true;
+        tooltipx=ttip;
+        if(_params=='entityfull'){
+            openURL(_page+'&id='+rowid,' status=yes menubar=no toolbar=no location=no scrollbars=yes resizable=yes left=100 top=100');
+            return;
+        }
+        if(_params=='inventoryfull'){
+            openURL(_page+'&id='+rowid,' status=yes menubar=no toolbar=no location=no scrollbars=yes resizable=yes left=100 top=100');
+            return;
+        }
+        _params = _params+','+rowid;
+        _page = _page+'&id='+rowid;
+        o=document.getElementById('olap');   //  overlap percent
+        olap1=0;
+        if(o) olap1=o.value;
+        o=document.getElementById('psize');  //  page size
+        psiz=10;
+        if(o) psiz=o.value;
+        myCtrl = _ctrl;
+        xmlHttp=GetXmlHttpObject();
+        if (xmlHttp==null) {
+            alert ('Browser does not support HTTP Request');
+            return;
+        }
+        waiter = '<table class=orange2 align=center cellpadding=4><tr><td nowrap valign=middle><img src=\"images/getd.gif\" border=0 height=80></td><td align=center><b>Please wait<br>&nbsp;&nbsp;&nbsp;&nbsp;while geting the details&nbsp;&nbsp;&nbsp;&nbsp;</b><td></tr></table>'
+        if(document.getElementById(myCtrl)) {
+            if (tooltipx=='0' && document.getElementById(myCtrl).innerHTML) document.getElementById(myCtrl).innerHTML=waiter;
+        }else{
+        }
+        var url=_page;
+        url=url+'&par='+_params;
+        url=url+'&ctrl='+myCtrl;
+        url=url+'&olap='+olap1;
+        url=url+'&psize='+psiz;
+        xmlHttp.onreadystatechange=stateChanged
+        xmlHttp.open('GET',url,true)
+        xmlHttp.send(null)
+    }
+    function stateChanged(){
+        if (xmlHttp.readyState==4 || xmlHttp.readyState=='complete') {
+            AJAXreply=xmlHttp.responseText
+            if (AJAXreply=='OKGO'){  //  additional Page security
+                document.getElementById('addsecuritydiv').style.display='none';
+                document.getElementById('maintable').style.display='block';
+            }
+            if (AJAXreply=='NOGO'){  //  additional Page security
+                alert('Additional Security failed\nAccess Denied');
+            }
+            o = document.getElementById(myCtrl);
+            if(myCtrl=='data') {
+                o = parent.frames[4];
+                o.document.clear();
+                o.document.write(AJAXreply);
+                return
+            }
+            if ((!o)  && (myCtrl!=''))  o = myCtrl;
+            //  fro message alert, if the ajax reply is null just close the box....
+            if(AJAXreply=='' && o.name=='dataalert2'){
+                o2 = parent.frames[2].document.getElementById('dataalert');
+                o2.style.display='none';
+                return;
+            }
+            if(o) {
+                if ((tooltipx=='0') && (o.type!='text')) o.innerHTML=AJAXreply;    //  set the control inner HTML with AJAXreply AJAXreply
+                if ((tooltipx=='0') && (o.type=='text')) o.value=AJAXreply;    //  set the control inner HTML with ajax AJAXreply
+                if (tooltipx=='1') o.title=AJAXreply;        //  set the control tiiotip with ajax AJAXreply
+                if (tooltipx=='3') o.title=AJAXreply;        //  set the control tiiotip with ajax AJAXreply
+                if (tooltipx=='9') o.value=AJAXreply;        //  set the control tiiotip with ajax AJAXreply
+                if ((tooltipx=='undefined') && (o.type=='undefined')) o.innerHTML=AJAXreply;
+                if ((tooltipx==undefined) && (o.type==undefined)) o.innerHTML=AJAXreply;
+            }else{
+            }
+                if ((tooltipx=='2')  || (tooltipx=='1')) {
+                    alert(AJAXreply);         //  the reply is alerted
+                    SpeakText(AJAXreply)
+                }
+        }
+        return true
+    }
+
+
+
+var IE = document.all?true:false;
+if (!IE) document.captureEvents(Event.MOUSEMOVE)
+var tempX = 0;
+var tempY = 0;
+function MouseXY(e) {
+    if (IE) { // grab the x-y pos.s if browser is IE
+        tempX = event.clientX + document.body.scrollLeft;
+        tempY = event.clientY + document.body.scrollTop;
+    }
+    else {  // grab the x-y pos.s if browser is NS
+        tempX = e.pageX;
+        tempY = e.pageY;
+    }
+    if (tempX < 0){tempX = 0;}
+    if (tempY < 0){tempY = 0;}
+    this.x = tempX;
+    this.y = tempY;
+    return this;
+}
+function delayBy(ms){
+    var Now = new Date();
+    var Start = Now.getTime();
+    diff=0
+    while (diff <= ms){
+       var Now = new Date();
+       var s = Now.getTime();          // Grab current millisecond #
+       diff = s - Start;         // Calculate the difference.
+    }
+    return true;
+}
+function elapsedmilliseconds() {   // Calculates elapsed time
+    var n = new Date();           // Grab new copy of date
+    var s = n.getTime();          // Grab current millisecond #
+    var diff = s - Start;         // Calculate the difference.
+    return diff;                  // Return the difference.
+}
+function setValue(ctrl,valu){
+    if(document.getElementById(ctrl)) document.getElementById(ctrl).value=valu;
+}
+function DMY2YMD(v){
+    return v.substr(6,4)+'-'+v.substr(3,2)+'-'+v.substr(0,2)
+}
+//=======================================   For excel type data entry
+    function string2jsArray(dString){
+        data1     = new Array;
+        dataRows  = dString.split('[[=]]');
+        for (r=0;r<dataRows.length;r++){
+            dataCols  = dataRows[r].split('[=]');
+            for (c=0;c<dataCols.length;c++){
+                xkey = 'data'+((r+1)*100)+(c+1);   //  first 2 chrs is row and secod two char is colum starting from 1
+                data1[xkey] = dataCols[c];
+            }
+        }
+        return data1;
+    }
+    //  Setting the date object to appropriate formatat before submission
+    function setDMY2YMD(){
+        for (r=1;r<=myRows;r++){
+            for (c=1;c<=dataCols.length;c++){
+                xkey = 'data'+(r*100)+c;   //  first 2 chrs is row and secod two char is colum starting from 1
+                temp   = formatsArray[c-1];
+                format = temp.toUpperCase();
+                obj = document.getElementById(xkey);
+                if ((format=="TXD") || (format=="FIN"))   {
+                    document.getElementById(xkey).value = DMY2YMD(obj.value);
+                }
+            }
+        }
+    }
+    function string2comboArray(dString){
+        data1     = new Array;
+        dataRows  = dString.split('[[=]]');
+        for (r=0;r<dataRows.length;r++){
+            data1[r]=new Array;
+            dataCols  = dataRows[r].split('[=]');
+            ttt = dataCols[0];
+            data1[r] = [dataCols[0],dataCols[1]];
+        }
+        return data1;
+    }
+    function setTable(id){
+        tbody = document.getElementById(id).getElementsByTagName("TBODY")[0];
+        setHeads();
+        addRows();
+    }
+    function addRows(){
+        firstObject = null;
+        for (r=1;r <= myRows;r++){
+            addCells(r) ;
+        }
+        firstObject.focus();
+    }
+    function addOneRow(){
+        lastObject=null;
+        myRows = myRows+1;
+        addCells(myRows) ;
+        if (colsPerRow<myCells) {
+            var row = document.createElement('TR');
+            var tdx = document.createElement('td');
+            row.appendChild(tdx);
+            tbody.appendChild(row);
+        }
+        lastObject.focus();
+    }
+    function addCells(r){
+        var objRow = document.createElement('TR')
+        colsInCurrentRow=0;
+        for (c=1;c<= myCells; c++){
+            //  Managing Multi rows of data
+            colsInCurrentRow++;
+            c1 = (parseInt(colsPerRow))+1;
+            c2 = (parseInt(colsPerRow)*2)+1;
+            c3 = (parseInt(colsPerRow)*3)+1;
+            if ((c==c1) || (c==c2) || (c==c3) ) {
+                tbody.appendChild(objRow);
+                objRow = document.createElement('TR');
+                colsInCurrentRow=1;
+            }
+            ctrl = addControl(r,c);
+            if(formatsArray[c-1].toUpperCase()=='PIC') pickColmn = c-1;
+            td1 = document.createElement('td');
+            td1.className = 'plum_row';
+            temp   = formatsArray[(c-1)];
+            format = temp.toUpperCase();
+            if (format!="HID") {  //  No td for hidden
+                td1.appendChild(ctrl);
+                objRow.appendChild(td1);
+            }else{
+                tbody.appendChild(ctrl);
+            }
+            if(c==1) ids[r]='0';  //  indictes it is new so insert query is built
+        }
+        leftOut =   parseInt(colsPerRow)-colsInCurrentRow-parseInt(hiddenControls);
+        for (j=1; j<leftOut; j++){
+             tx = document.createElement('td');
+             tx.innerHTML="...";
+             tx.className='plum_row';
+             objRow.appendChild(tx);
+        }
+        // last Cell for Images
+        td1 = document.createElement('td');
+        td1.className='plum_row';
+        img = document.createElement('img');
+        img.id = 'img'+r;
+        img.src='images/del0.gif';
+        img.border=0;
+        img.title='Unchanged record; Click to Delete'
+        img.onclick=function(){
+            if (this.src.indexOf('edit')>0) return false;
+            xkey = 'data'+(r*100)+1;
+            obj=document.getElementById(xkey);
+            if (this.src.indexOf('del0')>0){
+                obj.value='-'+obj.value;
+                this.src='images/close.gif';
+                this.title='Marked for Deletion...; Click to undelete;';
+                }else{
+                obj.value=obj.value.substr(1);
+                this.src='images/del0.gif';
+                this.title='Click for Deletion;';
+            }
+            };
+        td1.appendChild(img);
+        objRow.appendChild(td1);
+        tbody.appendChild(objRow);
+        //  adding a separator row
+        if (myCells > parseInt(colsPerRow)){
+            td1 = document.createElement('td');
+            td1.innerText=''
+            objRow = document.createElement('TR');
+            objRow.appendChild(td1);
+            tbody.appendChild(objRow);
+        }
+    }
+    function addControl(r,c){
+        var control;
+        temp   = formatsArray[c-1];
+        format = temp.toUpperCase();
+        xkey                = 'data'+(r*100)+c;   //  first 2 chrs is row and secod two char is colum starting from 1
+        if (format != 'CMB') control = document.createElement('input');
+        if (format == 'CMB') control = document.createElement('select');
+        control.className   = 'plum_boxsNoBorder';
+        control.style.width = '100%';
+        control.id          = xkey;
+        control.name        = xkey;
+        control.row         = r;
+        control.col         = c-1;
+        control.valign      = 'top';
+        if (widthsArray[c-1]) control.style.width = widthsArray[c-1] ;
+        if (xdata[xkey]){
+            control.value   = xdata[xkey];
+            if(c==0) ids[r] = xdata[xkey]
+        }else{
+            // comes here when add is pressed
+            control.value = defaultsArray[c-1];
+            xdata[xkey]   = defaultsArray[c-1];
+        }
+        //  setting validation events
+        control.onchange=function(){
+            img       = document.getElementById('img'+r);
+            xkey      = 'data'+(r*100)+1;
+            obj       = document.getElementById(xkey);
+            if (obj.value.substr(0,1)=='-') obj.value=obj.value.substr(1);
+            img.src   = 'images/edit.gif';
+            img.title = 'Edited; Pending Updation.';};
+        if ((temp)){
+        control.onfocus=function(){ this.select();};
+            idXkey      = 'data'+(r*100)+1;
+            if ((format.indexOf('TXR')>=0)  || (posted!='Active'))  control.readOnly=true;
+            if ((format.indexOf('TXR')>=0)  || (posted!='Active'))  control.className = 'plum_boxsNoBorderReadonly';
+            if ((format.indexOf('TXR')>=0)  || (posted!='Active'))  control.disabled=true;
+            if (format.indexOf('N')>=0)  control.style.textAlign='right'
+            if (format.indexOf('N')>=0)  control.onkeypress=function(){ return AllowNumeric(event);};
+            if ((format == 'HID'))  control.type='hidden';
+        }
+        if ((temp) && (format == 'CMB')){
+            selectedIndex=0
+            for (i=0;i<combo1Array.length;i++){
+                tOption = new Option(combo1Array[i][1], combo1Array[i][0], false, false);
+                control.options[i] = tOption;
+                //  setting the current value
+                if(xdata[xkey] == combo1Array[i][0]) control.options[i].selected=true;
+            }
+            control.className='plum_row';
+        }
+        if ((temp) && (format == 'PIC'))  control.onkeyup=function(){
+            pickValue=this.value;
+            l=pickValue.length;
+            if(l>2){   //  Min 2- 3characters for searching
+                row              = r;
+                ob               = document.getElementById('picker');
+                ob.style.display = 'block';
+                objLoc           = new findPos(this)
+                ob.style.left    = objLoc.x;
+                ob.style.top     = objLoc.y+20;
+                xkey = 'data'+(r*100)+(c+1);
+                nextObject = document.getElementById(xkey);
+                params = 'PICKLOOKUPS,'+pickValue+','+this.name;
+                ajax('plum_fw_ajax.php'  ,  'picker'  ,   params   ,  0);
+            }};
+        if ((temp) && ((temp.toUpperCase() == 'TXD') || (temp.toUpperCase() == 'FIN')))  control.onblur=function(){
+            dt     = new Date()      ;
+            dd     = dt.getDate()    ; if (dd<10) dd='0'+dt;
+            mm     = dt.getMonth()+1 ; if (mm<10) mm='0'+mm;
+            myDate = dd+'-'+mm+'-'+dt.getFullYear() ;
+            manageDate(this,myDate);};
+        control.onkeydown=function(){ keyOperated(event,this,r,c);};
+        //  ensure the correct control rcived the focus....
+        if ((!firstObject) && (!control.disabled) && (format!='H')) firstObject = control;
+        if ((!lastObject) && (!control.disabled) && (format!='H')) lastObject = control;
+        return control;
+    }
+    function keyOperated(objEvent,obj,r,c){
+        if(window.event){
+            iKeyCode = objEvent.keyCode;
+        }
+        newRow=9999;
+        //  key codes 37 left 38 down 39 right 40 down
+        cursorAt = 99;
+        if ((r>0) &&(iKeyCode=='37')){
+            cursorAt = Math.abs(document.selection.createRange().moveStart("character",-100));
+            if (cursorAt==0) newRow='data'+(r*100)+(c-1);
+        }
+        if ((r>0) &&(iKeyCode=='39')){
+            cursorAt = Math.abs(document.selection.createRange().moveStart("character",-100));
+            xkey = 'data'+(r*100)+c;
+            l = document.getElementById(xkey).value.length
+            if (cursorAt==l) newRow='data'+(r*100)+(c+1);
+        }
+        if ((r>1) &&(iKeyCode=='38'))      newRow='data'+((r-1)*100)+c;
+        if ((r<myRows) &&(iKeyCode=='40')) newRow='data'+((r+1)*100)+c
+        nextObj = document.getElementById(newRow)
+        if(nextObj){
+            nextObj.focus();
+            return true;
+        }
+        if ( (r==myRows) && (iKeyCode=='40') && (posted=='Active')) addOneRow();
+    }
+    function setHeads(row){
+        colsInCurrentRow=0;
+        var row = document.createElement('TR')
+        for (c=1;c<= myCells; c++){
+            colsInCurrentRow++;
+            c1 = (parseInt(colsPerRow))+1;
+            c2 = (parseInt(colsPerRow)*2)+1;
+            c3 = (parseInt(colsPerRow)*3)+1;
+            if ((c==c1) || (c==c2) || (c==c3) ){
+                tbody.appendChild(row);
+                row = document.createElement('TR');
+                colsInCurrentRow = 1;
+           }
+           temp   = formatsArray[c-1];
+           format = temp.toUpperCase();
+           if ((format == 'HID'))  hiddenControls++;
+           temp   = formatsArray[(c-1)];
+           format = temp.toUpperCase();
+           var td1       = document.createElement('td')
+           if ((format.indexOf('N')>=0) && (colsPerRow>=myCells))  td1.style.textAlign='right'
+           td1.className = 'plum_head';
+           t2 = fieldsArray[c-1];
+           td1.id = t2;
+           td1.name = t2;
+           td1.onclick="";
+           td1.onclick=function() { return ajax("plum_fw_ajax.php?tt=1&tbl=tbl",this.name,"FIELDHELP,"+this.name,1);};
+           if (format!='H') td1.innerHTML = '<b>'+headsArray[(c-1)]+'</b>';
+           if (format!='H') row.appendChild(td1);
+        }
+        leftOut =   parseInt(colsPerRow)-colsInCurrentRow-hiddenControls;
+        for (j=1; j<leftOut; j++){
+             tx = document.createElement('td');
+             tx.innerHTML="...";
+             tx.className='plum_head';
+             row.appendChild(tx);
+        }
+        //  Appending dummy left out rows at the end
+        td1 = document.createElement('td');  // Last empty cell above the delete icons
+        td1.style.width='1%';
+        td1.className = 'plum_head';
+        row.appendChild(td1);
+        tbody.appendChild(row);
+    }
+function saveData(){
+    document.getElementById("rows").value = myRows;
+    setDMY2YMD();
+    document.getElementById("cells").value = myCells;
+    document.getElementById("tableName").value = tableName;
+    document.getElementById("fields").value = fields;
+    //  when th user clicks save, all controls are enabled and submited
+    //  failing which these controls do not get posted to server
+    document.getElementById('table').style.filter = "Alpha(Opacity='50')";  //  While saving reducing opacity
+    document.f2.submit();
+}
+    function findPos(obj) {
+        var curleft = curtop = 0;
+        if (obj.offsetParent) {
+                curleft = obj.offsetLeft
+                curtop = obj.offsetTop
+                while (obj = obj.offsetParent) {
+                        curleft += obj.offsetLeft
+                        curtop += obj.offsetTop
+                }
+        }
+        this.x=curleft;
+        this.y=curtop
+        return this;
+    }
+    currRow = 0;
+    oldRow  = 0;
+    function XhandleKeyPress(e,mytb){
+        if (!e) e = window.event;
+        kcode = (e.keyCode);
+        maxRows = mytb.rows.length
+        if (kcode=='40') currRow ++;
+        if (kcode=='38') currRow --;
+        if ((mytb.id='picker') && (kcode=='27')){
+            document.getElementById('picker').style.display='none'
+            return true;
+        }
+        if (kcode=='13'){
+            pickedVal = mytb.rows[currRow].cells[0].innerText
+            document.getElementById('picker').style.display='none'
+            currObject.value=pickedVal;
+            nextObject.focus();
+        }
+        if (currRow < 0) currRow=maxRows-1;
+        if (currRow >= maxRows) currRow=0;
+        mytb.rows[currRow].cells[0].className='plum_row';
+        mytb.rows[oldRow].cells[0].className='plum_field';
+        if(mytb.rows[currRow].cells[1]) mytb.rows[currRow].cells[1].className='plum_row';
+        if(mytb.rows[oldRow].cells[1]) mytb.rows[oldRow].cells[1].className='plum_field';
+        oldRow=currRow;
+        return true;
+    }
+      function getRunChart(id){
+          elms = document.getElementsByTagName('img');
+          lx = elms.length;
+          for (i=0;i<lx;i++){
+              rc = 'rc' + id;
+              if (elms[i].width == '2') elms[i].src='images/grey.gif'
+              if (elms[i].width == '2') elms[i].width='1';
+              if (elms[i].title == rc) elms[i].src='images/red.gif'
+              if (elms[i].title == rc) elms[i].width='2';
+          }
+      }
+    function showChqTotals(){ //  used for adjustreceipt / adjustbills.php for chq amount total
+        elms = document.f2.elements;
+        sum=0.00;
+        for (i=0;i<elms.length;i++){
+            if(elms[i].name.substr(0,3)=='adj'){
+              valu = elms[i].value;
+                if (parseFloat(valu)>0) sum = sum + parseFloat(elms[i].value);
+            }
+        }
+        document.getElementById('chqtot').value=sum;
+    }
+    function getReverseRate(){
+    //  This function is used in orders / DCs / Invoices lines to reverse calcute rate
+        document.getElementById('reverseRate').style.display = 'none'
+        vatPercent =   parseFloat(document.getElementById('txtvatpercent').value) ;
+        if (isNaN(vatPercent)) vatPercent = 0;
+        staxPercent      = parseFloat(document.getElementById('txtservicetaxpercent').value) ;
+        if (isNaN(staxPercent)) staxPercent = 0;
+        cstPercent      = parseFloat(document.getElementById('txtcstpercent').value) ;
+        if (isNaN(cstPercent)) cstPercent = 0;
+        if ((vatPercent>0) && (staxPercent >0)){
+            alert('Both VAT and Service tax present..  Not processed');
+            return;
+        }
+        if ((vatPercent>0) && (cstPercent >0)){
+            alert('Both VAT and CST tax present..  Not processed');
+            return;
+        }
+        if ((cstPercent>0) && (staxPercent >0)){
+            alert('Both CST and Service tax present..  Not processed');
+            return;
+        }
+        if (cstPercent>0){
+            thisRate = parseFloat(document.getElementById('txtrate').value);
+            temp = parseFloat(100*thisRate/(1+(cstPercent/100)));
+            temp = Math.round(temp,2)/100;
+            document.getElementById('txtrate').value = temp;
+            alert('CST excluded Rate reworked\nRepeated clicking will rework again..  Be careful');
+            return ;
+        }
+        if (vatPercent>0){
+            thisRate = parseFloat(document.getElementById('txtrate').value);
+            temp = parseFloat(100*thisRate/(1+(vatPercent/100)));
+            temp = Math.round(temp,2)/100;
+            document.getElementById('txtrate').value = temp;
+            alert('VAT excluded Rate reworked\nRepeated clicking will rework again..  Be careful');
+            return ;
+        }
+        staxPercent      = parseFloat(document.getElementById('txtservicetaxpercent').value) ;
+        if (isNaN(staxPercent)) staxPercent = 0;
+        if (staxPercent>0){
+            staxAbetPercent  = parseFloat(document.getElementById('txtsertaxabetpercent').value) ;
+            if (isNaN(staxAbetPercent)) staxAbetPercent = 0;
+            staxCessPercent  = parseFloat(document.getElementById('txtservicetaxcesspercent').value) ;
+            if (isNaN(staxCessPercent)) staxCessPercent = 0;
+            staxHCessPercent = parseFloat(document.getElementById('txthecesssertaxpercent').value) ;
+            if (isNaN(staxHCessPercent)) staxHCessPercent = 0;
+            tempStaxPercent = staxPercent * (1-(staxAbetPercent/100));
+            tempCess = tempStaxPercent*((staxCessPercent+staxHCessPercent)/100);
+            totalTaxComponent =  parseFloat((tempStaxPercent+tempCess)/100);
+            thisRate = parseFloat(document.getElementById('txtrate').value);
+            temp = 100*thisRate/(1+totalTaxComponent);
+            temp = Math.round(temp,2)/100;
+            document.getElementById('txtrate').value = temp;
+            alert('Service Tax excluded Rate reworked\nRepeated clicking will rework again..  Be careful');
+            return ;
+        }
+    }
+    function timeDiff(tx,ty){
+        tx=(getTime2Decimal(tx));
+        ty=(getTime2Decimal(ty));
+        tz=ty-tx;
+        return(getDecimal2Time(tz));
+    }
+    function getTime2Decimal(a){
+       t1=parseInt(a);
+       t2=((a*100)-(t1*100))/100;
+       return(t1+(t2*100/60));
+    }
+    function getDecimal2Time(a){
+        t1=parseInt(a);
+        t2=((a*100)-(t1*100))/100;
+        return(t1+(t2*60/100));
+    }
+    function onEnter(ctrlx){
+        if(event.keyCode==13){
+            obj = document.getElementById(ctrlx);
+            obj.focus();
+        }
+    }
+    function toNumber(v){
+        if (isNaN(v)==1)  v=0;
+        return(v);
+    }
+    function toDecimal(v){
+        v=toNumber(v);
+        v=Math.round(v*100);
+        return (v/100)
+    }
+
+   function getuseridchk(){
+        rowids=document.getElementById('id').value;
+        usrid = document.getElementById('txtuserid').value;
+        ajax('plum_fw_ajax.php','useridverfy','getuseridchk,'+usrid+','+rowids,0);
+   }
+
+   function tagRecord(id,tb){
+        o=document.getElementById('datatag');
+        o.style.display='block';
+        o=document.getElementById('datatagif');
+        o.src='plum_fw_datatag.php?id='+id+'&tb='+tb;
+   }
+   function showReportLink(pg){
+ 		o=document.getElementById('rlink');
+        o.style.display='block';
+        o=document.getElementById('rlinkgif');
+        o.src='plum5_fw_utils.php?pg='+pg+'&action=rlinks';
+   }
+   function getPasswordStrength(password) {
+       //calculate strength out of length
+       var strength = 0;
+       var l = password.length;
+       if (l > 16) {
+           strength = 40;
+       }else{
+           if (l > 8) {
+               strength = 35;
+       }else{
+           if (l > 5) {
+              strength = 32;
+       }else{
+           if (l > 0){
+              strength = 3;
+       }else{
+           return 0; //no password means no strength, :-)
+       }
+       }
+       }
+       }
+       //Now consider the letters
+       if (password.match(/[a-z]/i)){
+          strength += 8; //at least one letter, 5 points
+          if (password.match(/[a-z][A-Z]|[A-Z][a-z]/)){
+             strength += 8  ; //mixed-case adds 2 points
+          }
+       } //no letter, no points,Now check for numbers
+       count = password.match(/[0-9]/g);
+       if (count){
+          strength += 5; //at least one number, 5 points
+          if (count > 2){
+             strength += 5; //three or more numbers, 2 extra points;
+          }
+       } //no number, no points,Now check for special characters
+       count = password.match(/[!,@,#,$,%,^,*,?,_,~,-]/g)
+       if (count){
+          strength += 8; //at least one special characters, 5 points
+          if (count > 1){
+             strenth += 8; //two or more special characters, 2 extra points
+          }
+       } //no special characters, no points
+    return strength;
+    }
+    function getDueDate(){
+        o = document.getElementById('txdissuedate');
+        a = o.value.split("-");
+        d = new Date(a[2], a[1]-0-1, a[0]-0+10) ;//year month date
+        //d.setDate(d.getDate()+10);
+        D = d.getDate();
+        M = d.getMonth()+1;
+        Y = d.getFullYear();
+        s =  D+"-" + M+ "-" + Y;
+        d = document.getElementById('txdduedate');
+        d.value=s;
+
+  }
+
+  function noFutureDate(ctrl){
+		if(document.getElementById(ctrl)){
+			  var currentTime = new Date();
+			  var month = currentTime.getMonth() + 1;
+
+			  var day = currentTime.getDate();
+			  var year = currentTime.getFullYear();
+			  if (month<10) month='0'+month;
+			  if (day<10) day='0'+day;
+			  yymmddToday = (year + "-" + month + "-" + day);
+			  yymmddEntered = dmy2ymd(document.getElementById(ctrl).value);
+			  if (yymmddEntered>yymmddToday){
+				  alert('In '+ctrl+' Future Date not permited');
+				  return false;
+			  }else{
+				  return true;
+			  }
+		}
+		return true;
+  }
+
+  function noNullDate(ctrl){
+        yymmddEntered = document.getElementById(ctrl).value;
+        if (yymmddEntered=='00-00-0000' || yymmddEntered==''){
+            alert('In '+ctrl+' Null Date is not permited');
+            return false;
+        }else{
+            return true;
+        }
+  }
+  function validPAN(ctrl){
+      ctrValue = document.getElementById(ctrl).value;
+      if (ctrValue!=''){
+          var myFormat = /^[a-z|A-Z]{5}?[0-9]{4}[a-z|A-Z]{1}?$/
+          v = myFormat.test(ctrValue) //returns true or false depending on userinput
+          if (v){
+              return true;
+          }else{
+              alert('PAN No patern is [aaaaa9999a]');
+              return false;
+          }
+      }
+  }
+    function minLength(ctrl,iWidth){
+        ctrValue = document.getElementById(ctrl).value;
+        if (ctrValue.length < iWidth && ctrValue.length > 0){
+            alert(ctrl+' must be Minimum '+iWidth+' Characters');
+            document.getElementById(ctrl).focus();
+        }
+
+    }
+
+function openSQC(ct){
+    v=document.getElementById(ct).value;
+    v=v.replace(', ',',');
+    min=document.getElementById('txtminvalu').value;
+    max=document.getElementById('txtmaxvalu').value;
+    ss=document.getElementById('txtsamplesize').value;
+    rj=document.getElementById('txtrejecton').value;
+	id=document.getElementById('id').value;
+    url = 'qc_normaldist.php?id='+id; //data='+v+'&max='+max+'&min='+min+'&ss='+ss+'&rj='+rj;
+    params = 'height=570 width=950 left=100 top=50 scrollbars=1 resizable=1';
+   openURL(url,params)
+}
+function pickqcparams(ic,ls){
+
+    url = 'qc_pickqcparams.php?ic='+ic+'&ls='+ls
+    params = 'height=600 width=650 left=100 top=50 scrollbars=1 resizable=0';
+    openURL(url,params)
+}
+function fillControl(ct,va){
+    document.getElementById(ct).value=va ;
+}
+function allowedBackDate(ctrl,currentdate,backdate,days){
+    if (ctrl.value<=backdate){
+        alert('Allowed '+days+' backdays, Date accepted above '+ymd2dmy(backdate)+' Date changed to current date '+currentdate);
+        document.f2[ctrl.name].value=currentdate;
+    }
+    return true;
+}
+function allowedVoucherBackDate(ctrl,currentdate,backdate,fyearstart,fyearend){
+	checkDate(ctrl,fyearstart,fyearend);
+	if (dmy2ymd(ctrl.value)<=ymd2dmy(backdate)){
+	    alert('Date accepted above '+ymd2dmy(backdate)+' Date changed to current date '+ymd2dmy(currentdate));
+        document.f2[ctrl.name].value=ymd2dmy(currentdate);
+    }
+    return true;
+}
+function openpickurl(url){
+    window.open(url,"Editor","height=225, width=400 left=200 top=200 scrollbars=20,resizable=0,toolbar=0,location=0,directories=0,status=0,menubar=0"); //
+}
+
+//  popup mini form
+function miniform(typ,rty,id,w,h,e){
+   myurl='plum_fw_mini_action_popup.php?typ='+typ+'&rty='+rty+'&id='+id+'&x='+e.screenX+'&y='+e.screenY+'&w='+w+'&h='+h;
+   openURL(myurl,'top=300,left=500,width=300,height=200');
+}
+
+function no_f11() {
+    if (event.keyCode == 122) {
+        event.keyCode = 0;
+        event.returnValue = false;
+    }
+}
+
+function togglePara(paraName){
+    obj=document.getElementById('img'+paraName);
+    if (obj){
+        var elms = document.f2.elements;
+        var elms = document.getElementsByTagName('td');
+        elementsCount =   elms.length
+        temp = 'para'+paraName;
+        img  = 'img'+paraName;
+        var thisele;
+        for (i=0;i<=elementsCount;i++){
+            thisele = elms[i];
+            if (thisele) {
+                controlName=thisele.paraname
+                if (controlName == temp) {
+                    if (thisele.style.display=='none') {
+                        thisele.style.display='block'
+                        }else{
+                        thisele.style.display='none'
+                    }
+                }
+            }
+        }
+        src=document.getElementById(img);
+        if (src)src=document.getElementById(img).src;
+            if (src){
+            if (src.indexOf('para1')>0) {
+                document.getElementById(img).src='images/para0.gif';
+                document.getElementById(img).title='Click to Open';
+            }else{
+                document.getElementById(img).src='images/para1.gif';
+                document.getElementById(img).title='Click to Collapse';
+            }
+        }
+    }
+}
+
+function addComment(fld,txt){
+    document.getElementById(fld).value=txt;
+
+}
+function serversidevalidation(obj,serverV){
+    fld     = obj.name;
+    pg      = document.getElementById('php').value;
+    valu    = document.getElementById(fld).value;
+	pt      = document.getElementById('pt').value;
+	tbn     = document.getElementById('tbn').value;
+    url='plum5_fw_utils.php?typ='+serverV+'&tbn='+tbn+'&fld='+fld+'&pg='+pg+'&pt='+pt+'&valu='+valu;
+    document.getElementById('editsideHeader').style.display='block';
+    document.getElementById('editsideHeader').style.backgroundColor='FFFF00';
+    document.getElementById('editsideHeader').style.color='000000';
+    document.getElementById('editsideHeader').innerHTML="Please wait... validating..";
+    elms = document.getElementsByTagName('input');
+    document.getElementById('submitBand').style.visibility='hidden';
+    document.getElementById('plum_submiter').src=url;
+}
+//  droping popup mechanism
+dropingSpeeed=10;       //speed in milli seconds
+dropingDistance=2;      //speed in milli seconds
+var dropingObj;
+function doDroping() {
+  v = parseInt(dropingObj.style.height);
+  dropingObj.style.height = parseInt(dropingObj.style.height)+dropingDistance+'px';
+  if (v<200)  setTimeout(doDroping,dropingSpeeed); // call doMove in 20msec
+
+}
+
+function initDroping() {
+  dropingObj = parent.parent.frames[2].document.getElementById('dropingObject'); // get the "foo" object
+  dropingObj.style.height = '0px'; // set its initial position to 0px
+  dropingObj.style.display='block';
+  doDroping(); // start animating
+}
+function closeDroping() {
+  dropingObj = parent.frames[2].document.getElementById('dropingObject'); // get the "foo" object
+  dropingObj.style.display = 'none'; // set its initial position to 0px
+}
+
+
+function openEntity(typ){
+    ec=document.getElementById('txtentitycode').value;
+	openURL('plum_fw_inteli2.php?rty='+typ+'&picker='+ec,' top=100, left=100, height=500, width=1100,modal=yes, location=No, scrollbars =No, status=Yes');
+}
+function openInventory(typ){
+    ic=document.getElementById('txtinventorycode').value;
+	openURL('plum_fw_inteli2.php?rty='+typ+'&picker='+ic,' top=100, left=100, height=500, width=1100,modal=yes, location=No, scrollbars =No, status=Yes');
+}
+
+//-----------------------
+function saveAppt( obj ){
+  /* Create the Outlook Object and Appointment Item */  
+  out = new ActiveXObject( "Outlook.Application" );   
+  /* Create an Appointment Item */  
+  appt = out.CreateItem( olAppointmentItem );
+  /* Transfer the data */  
+  appt.Subject = obj.Subject;  
+  appt.Location  = obj.Location;  
+  appt.Start = obj.Start;  
+  appt.ReminderMinutesBeforeStart = obj.ReminderMinutesBeforeStart;   /* Display the data */  appt.Display();  
+  /* If you want to save instead of viewing it change to appt.Save();*/
+}
+   
+    function SpeakText(my_test) {
+        var VoiceObj = new ActiveXObject("Sapi.SpVoice");
+        VoiceObj.Speak( my_test, 80 );
+    }
+    function GetXmlHttpObject(){
+        var xmlHttp=null;
+        try{
+           // Firefox, Opera 8.0+, Safari
+           xmlHttp=new XMLHttpRequest();
+           }
+           catch (e){
+           //Internet Explorer
+           try {
+           xmlHttp=new ActiveXObject('Msxml2.XMLHTTP');
+           }
+           catch (e){
+           xmlHttp=new ActiveXObject('Microsoft.XMLHTTP');
+           }
+        }
+        return xmlHttp;
+    }    
+    
+   function outlookMail(obj){
+
+        var objO = new ActiveXObject('Outlook.Application');      
+        var objNS = objO.GetNameSpace('MAPI');      
+        var mItm = objO.CreateItem(0);      
+        mItm.Display();      
+        mItm.To = 'sastry@wisseninc.com'; 
+        mItm.Subject = 'From ...  PLUM ERP '; 
+        mItm.Body = 'Dear Sir\nHow are you\n\n\n\nSastry';      
+        mItm.HTMLBody = obj.documentElement.outerHTML;
+        mItm.GetInspector.WindowState = 2; 
+    }
+   function CreateExcelSheet(obj){
+       var x=obj.rows
+        try{
+            var xls = new ActiveXObject('Excel.Application');
+        }catch (e) {
+            alert (e.message+'\nPlease set tools->Inetoptions->Security->custlevel->Initialie and script actives..  Set prompt');
+            return false;
+        }
+
+       xls.visible = true
+       xls.Workbooks.Add
+       for (i = 0; i < x.length; i++){
+           var y = x[i].cells
+           for (j = 0; j < y.length; j++){
+               xls.Cells( i+1, j+1).Value = y[j].innerText
+           }
+       }
+   }
+ 
+	function resizeX(v){  //  resizes all frames as required...
+		editFrameWidth='380'
+		dataFrameHeight ='180'
+		if(v==1)parent.document.getElementById('fset1').setAttribute('rows', '*,'+dataFrameHeight)
+		if(v==1)parent.document.getElementById('middle').setAttribute('cols','140,*,'+editFrameWidth)
+		
+		if(v==0)parent.document.getElementById('middle').setAttribute('cols','0,*,0')
+		if(v==0)parent.document.getElementById('fset1').setAttribute('rows', '*,0')
+
+		if(v==10)parent.document.getElementById('middle').setAttribute('cols','0,0,*')
+		if(v==10)parent.document.getElementById('fset1').setAttribute('rows', '*,0')
+
+		if(v==2)parent.document.getElementById('fset1').setAttribute('rows', '*,0')
+		if(v==2)parent.document.getElementById('middle').setAttribute('cols', '0,*,'+editFrameWidth)
+		if(v==3)parent.document.getElementById('fset1').setAttribute('rows', '*,'+dataFrameHeight)
+		if(v==3)parent.document.getElementById('middle').setAttribute('cols','0,*,'+editFrameWidth)
+		if(v==4)parent.document.getElementById('fset1').setAttribute('rows', '*,320')
+		if(v==4)parent.document.getElementById('middle').setAttribute('cols', '0,*,'+editFrameWidth)
+		if(v==5)parent.document.getElementById('fset1').setAttribute('rows', '*,0')
+		if(v==5)parent.document.getElementById('middle').setAttribute('cols', '0,*,80%')
+		if(v==6)parent.document.getElementById('fset1').setAttribute('rows', '*,0')
+		if(v==6)parent.document.getElementById('middle').setAttribute('cols', '140,*,0')
+		if(v==7)parent.document.getElementById('fset1').setAttribute('rows', '*,0')
+		if(v==7)parent.document.getElementById('middle').setAttribute('cols', '0,450,*') 
+		if(v==8)parent.document.getElementById('fset1').setAttribute('rows', '*,0')
+		if(v==8)parent.document.getElementById('middle').setAttribute('cols', '140,*,0') 
+		if(v==9)parent.document.getElementById('fset1').setAttribute('rows', '*,0')
+		if(v==9)parent.document.getElementById('middle').setAttribute('cols', '0,450,*') 
+
+	}
+function getSelText() {  //  used for inteligent sms email sening popup sastry Feb 2011
+    var txt = '';
+    if (window.getSelection)
+    {
+    txt = window.getSelection();
+    }
+    else if (document.getSelection)
+    {
+    txt = document.getSelection();
+    }
+    else if (document.selection)
+    {
+    txt = document.selection.createRange().text;
+    }
+    return txt ;
+}
+
+// split the data from the fundoo site
+function splitFundoo(){
+		data = document.getElementById('txtremarks').value;
+		aa = data.split('\r\n');
+		for(i=0;i<aa.length;i++){
+			val = aa[i].split(':');
+			val[0] = val[0].replace(/^\s+|\s+$/g,"")
+			val[1] = val[1].replace(/^\s+|\s+$/g,"")
+			if(val[0]=='City') document.getElementById('txtcity').value=val[1]; 
+			if(val[0]=='Address') document.getElementById('txtaddress1').value=val[1]; 
+			if(val[0]=='Website') document.getElementById('txturl').value=val[1]; 
+			if(val[0]=='Phone No') document.getElementById('txtmobile').value=val[1]; 
+			if(val[0]=='Industry') document.getElementById('txtindustry').value=val[1]; 
+			if(val[0]=='State') document.getElementById('txtstate').value=val[1]; 
+			if(val[0]=='Pin') document.getElementById('txtzip').value=val[1]; 
+		}
+		document.getElementById('txtcurrentstatus').value='CAMPAIGN'; 
+
+}
+function statementofacc(){
+    acc=document.getElementById('txtaccountsmastercode').value
+    accgrp=document.getElementById('txtaccountgroups').value
+    if(accgrp!='CASH AND BANK ACCOUNTS')url='acc_splledger.php?t=c&direct=1&acc='+acc
+    if(accgrp=='CASH AND BANK ACCOUNTS')url='acc_report_outdaybook.php?t=c&direct=1&acc='+acc
+    openURL(url,'height=450 width=690 left=100 top=100 scrollbars=1 resizable=0')
+}
+function statementofcus(){
+    acc=document.getElementById('txtentitycode').value
+    url='acc_ledger.php?t=c&direct=1&acc='+acc
+    openURL(url,'height=450 width=690 left=100 top=100 scrollbars=1 resizable=0')
+}
+
+	function checkpwd(pid) {
+		pwdobj = document.getElementById(pid);
+		if(pwdobj.value.length < 8)  {
+			alert('Password should be minimum of 8 characters...');
+			pwdobj.value = '';
+		}
+		else if(/\d/.test(pwdobj.value) == false) {
+			alert('Password Should consists atleast one Numberic Value...');
+			pwdobj.value = '';
+		}
+	}
+	function getPrompt(mess,objID){
+		v1 = document.getElementById(objID).value;
+		stat = document.getElementById('txtdocstatus').value;
+		prodgrp = document.getElementById('txtproductgroup').value;
+		if(stat=='Active' && (prodgrp=='NON STOCK MATERIALS' || prodgrp=='SERVICES' || prodgrp=='FIXED ASSETS')){
+			reply = prompt(mess, v1);
+			if(!reply)	reply = v1;
+			document.getElementById(objID).value = reply
+		}else{
+			if(prodgrp!='NON STOCK MATERIALS' && prodgrp!='SERVICES' && prodgrp!='FIXED ASSETS')	alert('Item name can not be changed for this Item Group'); 
+			else if(stat!='Active')	alert('Document is posted or closed etc...  no editing possible');
+		}
+	}
+
+	function getPromptEntity(mess,objID){
+			v1 = document.getElementById(objID).value;
+			stat = document.getElementById('txtdocstatus').value;
+			code = document.getElementById('txtentitycode').value;
+			if(stat=='Active' && (code=='GENERIC CUSTOMER' || code=='GENERIC VENDOR')){
+				reply = prompt(mess, v1);
+				if(!reply)	reply = v1;
+				document.getElementById(objID).value = reply
+			}else{
+				if(code!='GENERIC CUSTOMER' && code!='GENERIC VENDOR')	alert('Name can not be changed for this Vendor or Customer'); 
+				else if(stat!='Active')	alert('Document is posted or closed etc...  no editing possible');
+			}
+	}	
+	function getPromptTitle(mess,objID){
+		v1 = document.getElementById(objID).value;
+		reply = prompt(mess, v1);
+		if(!reply)	reply = v1;
+		document.getElementById(objID).value = reply;
+	}	
+
+    function ismaxlength(obj){
+	var mlength=obj.getAttribute? parseInt(obj.getAttribute("maxlength")) : ""
+	mlength=20000;
+	if (obj.getAttribute && obj.value.length>mlength)
+	obj.value=obj.value.substring(0,mlength)
+	}
+	function openTranslate(ctrl){
+		url='poc_cbank_meeting.php?rty=translate&ctrl='+ctrl;
+		openURL(url,"width=600,height=350")	
+	}
+   function openTaxes1(){ //  called from sales order/dc or invoice for geting the taxes
+   alert ('texes');
+   exit;
+	    po=document.getElementById('txtdocstatus');
+	    prod=document.getElementById('txtinventorycode');
+		dtyx=document.getElementById('txtdocumenttype');
+		if (po){
+			povalue=po.value
+			if (po.value=='Posted'){
+				alert ('Document is already posted...  No TDS Setting');
+				return ;
+			}
+		}else{ 
+			alert('docstatus field missing... in form');
+		}
+		/* if(prod &&  prod.value==''){
+		    alert('Product not selected');
+			return false;
+		} */ 
+		//url='plum_fw_mini_action_popup.php?typ=taxes&dty='+dtyx.value+'&prod='+prod.value;
+		url='plum_fw_mini_action_popup.php?typ=taxes&dty='+dtyx.value;
+		openURL(url,"width=350,height=350")		
+	}
+	   function openTaxes(){ //  called from sales order/dc or invoice for geting the taxes
+	    po=document.getElementById('txtdocstatus');
+	    prod=document.getElementById('txtinventorycode');
+		dtyx=document.getElementById('txtdocumenttype');
+		if (po){
+			povalue=po.value
+			if (po.value=='Posted'){
+				alert ('Document is already posted...  No TDS Setting');
+				return ;
+			}
+		}else{ 
+			alert('docstatus field missing... in form');
+		}
+		/*  if(prod && prod.value==''){
+		    alert('Product not selected');
+			return false;
+		}
+		  */ 
+		url='plum_fw_mini_action_popup.php?typ=taxes&dty='+dtyx.value;
+		openURL(url,"width=350,height=350")		
+	}
+	
+	function Opportunities(){ 
+	    ec=document.getElementById('txtentitycode');
+		en=document.getElementById('txtentityname');
+		url='plum_fw_mini_action_popup.php?typ=oppur&ec='+ec.value;
+		openURL(url,"width=200,height=35");
+	}
+
+    function openTDS(){ //  called from bank payment form javascript etc opens a ,iniaction popup
+	    po=document.getElementById('txtdocstatus');
+		if (po){
+			povalue=po.value
+			if (po.value=='Posted'){
+				alert ('Document is already posted...  No TDS Setting');
+				return ;
+			}
+		}else{
+			alert('docstatus field missing... in form');
+		}
+	    v=document.getElementById('txtpanno');
+		pan=''
+		if(v){
+			pan=v.value.substr(3,1);
+		}else{
+		    alert('PAN Number field Missing in form...  Please put it')
+		}
+		url='plum_fw_mini_action_popup.php?pan='+pan+'&typ=tds'
+		openURL(url,"width=350,height=350")		
+	}
+	// this function is called in the purchase order lines for the field alloweddeviationquantity
+	function calcdevqty(v){
+		stat = document.getElementById('txtdocstatus').value;
+	//alert(stat);
+		if(stat=='Active'){
+			if(v=='v'){
+				document.getElementById('txtalloweddeviationquantity').value = document.getElementById('aqty').value;
+			} 
+			if(v=='p'){
+				percent=document.getElementById('aqty').value;
+				qty =document.getElementById('txtquantity').value;
+				document.getElementById('txtalloweddeviationquantity').value = ((qty)*percent/100);
+			}
+			setSelfSessionRefresh('txtalloweddeviationquantity');
+		}
+		else{ 
+			alert('Record is Posted...So Deviation Qty can be entered..');
+		}
+	}
+
+//  for disabling the right click
+	function checkClick(myclick){
+		if (navigator.appName == "Netscape" && myclick.which == 3){ 	
+			alert('Sorry...');
+			return false; 
+		} 
+		if (navigator.appVersion.indexOf("MSIE") != -1 && event.button == 2) { 	
+			alert('Sorry...');
+			return false; 
+		} 
+		window.status='aaaaaaaaaaa';
+	} 
+	
+	function showStatus(u){
+		alert(u+'xxx')
+		if (u=='admin') window.status='Plum ERP';
+		return true
+	}
+	
+	function pickterms(ctrl,terms,showhide){
+		url='plum_generic_terms.php?shide='+showhide+'&ctrl='+ctrl+'&terms='+terms;
+		window.open(url,"Editor","height=550 location=0 menubar=0 width=300 left=200 top=100 scrollbars=1 titlebar=0 resizable=0");
+	}
+	
+	function BuildItemName(){
+		pg = document.getElementById('txtproductgroup').value;
+		typ = document.getElementById('txtsource').value;
+		gsm = document.getElementById('txtgrade').value;
+		sl = document.getElementById('txtsizelength').value;
+		sw = document.getElementById('txtsizewidth').value;
+		sname = document.getElementById('txtshortname').value;
+		grain = document.getElementById('txtcharacteristics').value;
+		mk = document.getElementById('txtmake').value;
+		val = pg+' '+typ+' ' +gsm+' GSM '+sl+' CM X '+sw+' CM '+grain+' '+sname+' '+mk;
+		val =val.toUpperCase();
+		document.getElementById('txtname').value=val;
+	}
+	
+	function ItemStockBal(){
+		it = document.getElementById('txtinventorycode').value;
+		itname = document.getElementById('txtinventoryname').value;
+		if(it=='' || it=='None'){
+			alert('Please pick the Item');
+		}
+		else{
+			IURL= 'plum_sql2html.php?rty=ibal&ic='+it+'&in='+itname;
+			openURL(IURL,'scrollbars=yes resizable=no left=400 top=250 width=600 height=250');
+			
+		}
+		return;
+	}
+	function ProductStockBal(){
+		it = document.getElementById('txtinventorycode').value;
+		itname = document.getElementById('txtinventoryname').value;
+		if(it=='' || it=='None'){
+			alert('Please pick the Product');
+		}
+		else{
+			IURL= 'plum_sql2html.php?rty=pbal&ic='+it+'&in='+itname;
+			openURL(IURL,'scrollbars=yes resizable=no left=400 top=250 width=600 height=250');
+			
+		}
+		return;
+	}
+	function getForEx(){  //  foreign exchange! picker for all fields
+		tbx=document.getElementById('tbn').value
+		idx=document.getElementById('id').value
+		url='plum_fw_mini_action_popup.php?typ=exchange&tb='+tbx+'&id='+idx;
+        openURL(url,'left=100 top=100 width=300 height=200 status=yes menubar=no toolbar=no location=no scrollbars=yes resizable=yes ');
+        return;
+	}
+
+	function getExport(t){
+		tot=0;
+		if(t=='ct3'){
+			duty   = parseFloat(document.getElementById('txtct3duty').value);
+			cess   = parseFloat(document.getElementById('txtct3cess').value);
+			hecess = parseFloat(document.getElementById('txtct3hecess').value); 
+			if((duty==0.00) || (cess==0.00) || (hecess==0.00)){
+				alert('Enter the Duty/Cess/Hecess value(s)');
+				return;
+			}
+			tot = duty+cess+hecess;		
+		} 
+		docsta=document.getElementById('txtdocstatus').value;
+		if(docsta!='Active'){
+			alert('Document is posted or closed etc...  no editing possible');
+			return;
+		} 
+		
+		idx=document.getElementById('id').value;
+		url='plum_fw_mini_action_popup.php?typ='+t+'&id='+idx+'&tot='+tot;
+        openURL(url,'left=200 top=150 width=650 height=350 status=yes menubar=no toolbar=no location=no scrollbars=yes resizable=yes ');
+        return;
+	}
+	
+	function nofuturedate(objname){
+		entdate=document.getElementById(objname).value
+		date2 = dmy2ymd(entdate);//.split('-');
+		docdate  = document.getElementById('txtdocumentdate').value;
+		date1=docdate.substr(0,10);
+		//date2 = temp[2]+'-'+temp[1]+'-'+temp[0];
+		if(date1<=date2){ 
+			err = '';
+			
+		}else {
+			err = 'Required By Date ('+entdate+') Must be greater than the ('+ymd2dmy(docdate)+').';
+			
+		}
+		return err;
+	}
+	function getCT3(){  //  ct3/pc picker for all fields
+		e=document.getElementById('txtentitycode').value;
+		pg=document.getElementById('txtproductgroup').value;
+		s=document.getElementById('txtsource').value;
+		idx=document.getElementById('id').value;
+		url='plum_fw_mini_action_popup.php?typ=ct3&e='+e+'&pg='+pg+'&s='+s+'&id='+idx;
+        openURL(url,'left=200 top=150 width=650 height=350 status=yes menubar=no toolbar=no location=no scrollbars=yes resizable=yes ');
+        return;
+	}
+	function getAdv(){  //  advance license picker for all fields
+		idx=document.getElementById('id').value;
+		url='plum_fw_mini_action_popup.php?typ=advimp&id='+idx;
+        openURL(url,'left=200 top=150 width=650 height=350 status=yes menubar=no toolbar=no location=no scrollbars=yes resizable=yes ');
+        return;
+	}
+	
+	function setOpenerSessionRefresh(str1){
+		vArray = str1.split(',');
+		url='plum_fw_refresher.php?sr=1';
+		for(i=0;i<(vArray.length);i++){
+			k=vArray[i];
+			o = window.opener.document.getElementById(k);
+			if(o) url=url+'&'+k+'='+o.value;
+			
+		}
+		myframe=window.opener.document.getElementById('plum_submiter');
+		if(myframe) myframe.src=url;
+		
+	}
+	function setSelfSessionRefresh(str1){
+		vArray = str1.split(',');
+		url='plum_fw_refresher.php?sr=1';
+		for(i=0;i<(vArray.length);i++){
+			k=vArray[i];
+			o = window.document.getElementById(k);
+			if(o) url=url+'&'+k+'='+o.value;
+		}
+		myframe=window.document.getElementById('ifdatapick');
+		if(myframe) myframe.src=url;
+	}
+
+	function setScale(fld,valu){  //  use for scaling control
+		document.getElementById(fld).value=valu
+		for(i=0;i<=10;i++){
+			ob=document.getElementById('scaleimg'+fld+i)
+			ob.src='images/grey.gif'
+			if(i==valu)document.getElementById('scaleimg'+fld+i).src='images/red.gif'
+		}
+	}
+	// use for slider control 
+	function slideme2(cname,xnum){
+		temp=document.getElementById(cname).value;
+		v=parseInt(temp);
+		document.getElementById(cname+'_'+v).src='images/slider_line.gif';
+		document.getElementById(cname).value=xnum;
+		document.getElementById(cname+'_'+xnum).src='images/slider_bullet.gif';	
+	}
+	function showEditPage(){
+		if(parent.document.getElementById('messageband')) parent.document.getElementById('messageband').style.display='none';
+		if(parent.document.getElementById('topband1')) parent.document.getElementById('topband1').style.display='block';
+		if(parent.document.getElementById('topband2')) parent.document.getElementById('topband2').style.display='block';
+		if(parent.document.getElementById('maintable')) parent.document.getElementById('maintable').style.display='block';			
+		parent.document.getElementById('editsideHeader').style.display='block';
+		parent.document.getElementById('editwaiterclock').style.display='none';				
+		parent.document.getElementById('bottomband').style.display='block';
+		parent.document.getElementById('submitBand').style.visibility='visible';
+	}
+	function AllFramesBlank(){
+		parent.frames[3].location.href='blank.htm';
+		parent.frames[4].location.href='blank.htm';
+		//parent.frames[5].location.href='blank.htm';
+	}
+	
+/*	
+	window.onload = function(){
+	    obj=document.getElementById('siteLoader');
+	    obj1=document.getElementById('container');
+	    if(obj!=null) document.getElementById('siteLoader').style.display = 'none';
+	    if(obj1!=null) document.getElementById('container').style.display = 'block';
+	}
+*/
+
+function patternCheck(obj,objEvent,pat){
+	//  obj =this, objEvent=event, pat='actual pattern you wanted'
+	//  pattern x-any, A-upper, a-Lower, 9-Numeric and decimal, $-#$-/,
+	//  usage onkeypress='return patcheck(this,event,"999-999-9999");'
+	
+	if (pat.toUpperCase()=="PHONE") pat='999-999-9999';
+	if (pat.toUpperCase()=="U") pat='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+	if (pat.toUpperCase()=="L") pat='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+	if (pat.toUpperCase()=="X") pat='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+	
+	pat=pat+'*';
+	low='_ abcdefghijklmnopqrstuvwxyz';
+	upp='_ ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	spl='__#$-/,@';
+	dot='.';   //  auto replacement pattern
+	dash='-';  //  auto replacement pattern
+	num='___0.123456789';
+	iKeyCode=0;
+	if(window.event){
+        iKeyCode = objEvent.keyCode;
+    }
+        else if(objEvent.which){
+        iKeyCode = objEvent.which;
+    }
+	var str1=obj.value;
+	var strlen=str1.length;
+	var actualkey=String.fromCharCode(iKeyCode)
+	
+	actualkeyUpper=actualkey.toUpperCase();
+	actualkeyLower=actualkey.toLowerCase();
+	patstr=pat.substr(strlen,1)
+	patstrnext=pat.substr(strlen+1,1)
+	iKeyCode=45;
+	if (patstr=='*') {
+		alert('Data Complete');
+		return false;
+	}
+	if (patstrnext==dot){
+		obj.value=str1+actualkey+dot;
+		return false;
+	}	
+	if (patstrnext==dash){
+		obj.value=str1+actualkey+dash;
+		return false;
+	}
+	if ((patstr=='9') && (num.indexOf(actualkey)<0)){
+		alert('Expecting only \n['+num+'] characters');
+		return false;
+	}		
+	if ((patstr=='9') && (num.indexOf(actualkey)>0)){
+		obj.value=str1+actualkey;
+		return false;
+	}	
+	if ((patstr=='9') && (actualkey=='.') && (str1.indexOf('.'))>0){
+		alert('Decimal already present');
+		return false;
+	}
+
+	if ((patstr=='$') && (spl.indexOf(actualkey)<0)){
+		alert('Expecting only \n['+spl+'] characters');
+		return false;
+	}	
+	if ((patstr=='$') && (spl.indexOf(actualkey)>0)){
+		obj.value=str1+actualkey;
+		return false;
+	}
+	//alert(num)
+	//alert(patstr)
+	//alert(actualkey);	
+	if ((patstr=='A') && ((upp.indexOf(actualkey)>0) || (low.indexOf(actualkey)>0))){
+		obj.value=str1+actualkeyUpper;
+		return false;
+	}	
+	if (patstr=='x' && ((low.indexOf(actualkey)<0) || (upp.indexOf(actualkey)<0))){
+		obj.value=str1+actualkey;
+		return false;
+	}		
+	if (patstr=='a' && ((upp.indexOf(actualkey)>0) || (low.indexOf(actualkey)>0))){
+		obj.value=str1+actualkeyLower;
+		return false;
+	}	
+
+	
+	return false;
+}
+
+	function getGenericPrompt(mess,objID, fldObj, val1,val2, objID1){
+		v1 = document.getElementById(objID).value;
+		fieldValue = document.getElementById(fldObj).value;
+		if(fieldValue == val1 || fieldValue == val2) {
+			reply = prompt(mess, v1);
+			if(!reply){
+			reply = v1;
+			}
+			document.getElementById(objID).value = reply.toUpperCase();
+			if(document.getElementById(objID1))	document.getElementById(objID1).value = reply.toUpperCase();
+		}
+		else{
+			alert('Can not change for '+fieldValue);
+		}
+	}
+
+    function displayframe(msg){
+		alert(msg);
+		return false;
+	}
