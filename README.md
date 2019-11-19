@@ -12,7 +12,7 @@
 👤 **Abhishek Ranjan, Aakash Kumar Goryan**
 
 * Website: https://www.geeksunboxed.com
-* Github: [@abhishekr700](https://github.com/abhishekr700)
+* Github: [@abhishekr700](https://github.com/abhishekr700) , [@aakashkumar](https://github.com/Aakash-Kumar-Goryan)
 
 ## Show your support
 
